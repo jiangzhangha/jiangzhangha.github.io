@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>stress命令使用简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">stress命令使用简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 21, 2021&nbsp;&nbsp;20:38:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>stress 是一款压力测试工具，可以用它来对系统 CPU，内存，以及磁盘 IO 生成负载，从而模拟压力测试。比如若 docker 容器设置了 CPU 与内存的限额，则可以在容器内运行 stress 命令进行压力测试，以验证容器设置的 CPU 与内存限额的正确性。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>在 ubuntu 系统下，可执行命令安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get install stress</span><br></pre></td></tr></table></figure>
+
+<p>在 centos 系统下，可执行命令安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install stress</span><br></pre></td></tr></table></figure>
+
+<p>若为源码安装，则需要进行配置，编译，安装等步骤。主要步骤为：</p>
+<ol>
+<li>下载源码压缩包，并解压，<code>tar -xzvf stress-1.0.4.tar.gz</code></li>
+<li>进入到已经解压的文件夹，进行配置，<code>./configure</code></li>
+<li>编译源码，<code>make</code></li>
+<li>安装前检查，<code>make check</code></li>
+<li>安装，<code>make install</code></li>
+<li>输入命令，验证安装是否正确，<code>stress --version</code></li>
+</ol>
+<p>一般在源码解压后的文件夹中，可以看到一个名为 <code>INSTALL</code> 的文件，文件中描述了该软件的安装方法，比如，对于 stress 源码包中的 <code>INSTALL</code> 文件，具有以下的安装相关描述：</p>
+<blockquote>
+<p>The simplest way to compile this package is:</p>
+<ol>
+<li><p><code>cd&#39; to the directory containing the package&#39;s source code and type </code>./configure’ to configure the package for your system.  If you’re<br>using <code>csh&#39; on an old version of System V, you might need to type </code> sh ./configure’ instead to prevent <code>csh&#39; from trying to execute </code> configure’ itself.</p>
+<p>Running `configure’ takes awhile.  While running, it prints some<br>messages telling which features it is checking for.</p>
+</li>
+<li><p>Type `make’ to compile the package.</p>
+</li>
+<li><p>Optionally, type `make check’ to run any self-tests that come with<br>the package.</p>
+</li>
+<li><p>Type `make install’ to install the programs and any data files and<br>documentation.</p>
+</li>
+<li><p>You can remove the program binaries and object files from the<br>source code directory by typing <code>make clean&#39;.  To also remove the files that </code> configure’ created (so you can compile the package for<br>a different kind of computer), type <code>make distclean&#39;.  There is also a </code> make maintainer-clean’ target, but that is intended mainly<br>for the package’s developers.  If you use it, you may have to get<br>all sorts of other programs in order to regenerate files that came<br>with the distribution.</p>
+</li>
+</ol>
+</blockquote>
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p>可以查看 stress 的帮助文档：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[jamza@A23488811 stress-1.0.4]$ stress --help</span><br><span class="line">`stress&#x27; imposes certain types of compute stress on your system</span><br><span class="line"></span><br><span class="line">Usage: stress [OPTION [ARG]] ...</span><br><span class="line"> -?, --help         show this help statement</span><br><span class="line">     --version      show version statement</span><br><span class="line"> -v, --verbose      be verbose</span><br><span class="line"> -q, --quiet        be quiet</span><br><span class="line"> -n, --dry-run      show what would have been done</span><br><span class="line"> -t, --timeout N    timeout after N seconds</span><br><span class="line">     --backoff N    wait factor of N microseconds before work starts</span><br><span class="line"> -c, --cpu N        spawn N workers spinning on sqrt()</span><br><span class="line"> -i, --io N         spawn N workers spinning on sync()</span><br><span class="line"> -m, --vm N         spawn N workers spinning on malloc()/free()</span><br><span class="line">     --vm-bytes B   malloc B bytes per vm worker (default is 256MB)</span><br><span class="line">     --vm-stride B  touch a byte every B bytes (default is 4096)</span><br><span class="line">     --vm-hang N    sleep N secs before free (default none, 0 is inf)</span><br><span class="line">     --vm-keep      redirty memory instead of freeing and reallocating</span><br><span class="line"> -d, --hdd N        spawn N workers spinning on write()/unlink()</span><br><span class="line">     --hdd-bytes B  write B bytes per hdd worker (default is 1GB)</span><br><span class="line"></span><br><span class="line">Example: stress --cpu 8 --io 4 --vm 2 --vm-bytes 128M --timeout 10s</span><br><span class="line"></span><br><span class="line">Note: Numbers may be suffixed with s,m,h,d,y (time) or B,K,M,G (size).</span><br></pre></td></tr></table></figure>
+
+<p>翻译成中文，大体使用方法为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">-? 显示帮助信息</span><br><span class="line">-v 显示版本号</span><br><span class="line">-q 不显示运行信息</span><br><span class="line">-n，--dry-run 显示已经完成的指令执行情况</span><br><span class="line">-t --timeout N 指定运行N秒后停止</span><br><span class="line">   --backoff N 等待N微妙后开始运行</span><br><span class="line">-c --cpu 产生n个进程 每个进程都反复不停的计算随机数的平方根</span><br><span class="line">-i --io  产生n个进程 每个进程反复调用sync()，sync()用于将内存上的内容写到硬盘上</span><br><span class="line">-m --vm n 产生n个进程,每个进程不断调用内存分配malloc和内存释放free函数</span><br><span class="line">   --vm-bytes B 指定malloc时内存的字节数 (默认256MB)</span><br><span class="line">   --vm-hang N 指示每个消耗内存的进程在分配到内存后转入休眠状态，与正常的无限分配和释放内存的处理相反，这有利于模拟只有少量内存的机器</span><br><span class="line">-d --hadd n 产生n个执行write和unlink函数的进程</span><br><span class="line">   --hadd-bytes B 指定写的字节数，默认是1GB</span><br><span class="line">   --hadd-noclean 不要将写入随机ASCII数据的文件Unlink</span><br></pre></td></tr></table></figure>
+
+<p>时间单位可以为秒 s，分 m，小时 h，天 d，年 y;文件大小单位可以为 K，M，G</p>
+<h2 id="使用实例"><a href="#使用实例" class="headerlink" title="使用实例"></a>使用实例</h2><p>产生 13 个 cpu 进程 4 个 io 进程 1 分钟后停止运行<br><code>$ stress -c 13 -i 4 --verbose --timeout 1m</code></p>
+<p>产生 3 个 cpu 进程、3 个 io 进程、2 个 10M 的 malloc()/free()进程，并且 vm 进程中 malloc 的字节不释放<br><code>$ stress --cpu 3 --io 3 --vm 2 --vm-bytes 10000000 --vm-keep --verbose</code></p>
+<p>测试硬盘，通过 mkstemp()生成 800K 大小的文件写入硬盘，对 CPU、内存的使用要求很低<br><code>$ stress -d 1 --hdd-noclean --hdd-bytes 800k</code></p>
+<p>产生 13 个进程，每个进程都反复不停的计算由 rand ()产生随机数的平方根<br><code>$ stress -c 13</code></p>
+<p>产生 1024 个进程，仅显示出错信息<br><code>$ stress --quiet --cpu 1k</code></p>
+<p>产生 4 个进程，每个进程反复调用 sync()，sync()用于将内存上的内容写到硬盘上<br><code>$ stress -i 4</code></p>
+<p>向磁盘中写入固定大小的文件，这个文件通过调用 mkstemp()产生并保存在当前目录下，默认是文件产生后就被执行 unlink(清除)操作，但是可以使用–hdd-bytes 选项将产生的文件全部保存在当前目录下，这会将你的磁盘空间逐步耗尽</p>
+<p>生成小文件<br><code>$ stress -d 1 --hdd-noclean --hdd-bytes 13</code></p>
+<p>生成大文件<br><code>$ stress -d 1 --hdd-noclean --hdd-bytes 3G</code></p>
+<p>模拟 4 个进程，每个进程分配 1000M 内存，每个消耗内存的进程在分配到内存后转入睡眠状态 3 秒，然后释放内存，一直重复执行这个过程<br><code>$ stress --vm 4 --vm-bytes 1000M --vm-hang 3</code></p>
+<p>模拟 4 个进程，每个进程分配 1000M 内存，进程一直占用内存<br><code>$ stress --vm 4 --vm-bytes 1000M --vm-keep</code></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/"># 技术工具</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
