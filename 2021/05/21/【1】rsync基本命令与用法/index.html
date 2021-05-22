@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>【转载】rsync简介：基本命令与用法 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【转载】rsync简介：基本命令与用法</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 21, 2021&nbsp;&nbsp;17:48:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/f-ck-need-u/p/7220009.html">https://www.cnblogs.com/f-ck-need-u/p/7220009.html</a></p>
+</blockquote>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>rsync 官方网站: <a target="_blank" rel="noopener" href="https://www.samba.org/ftp/rsync/rsync.html">https://www.samba.org/ftp/rsync/rsync.html</a><br>rsync 是可以实现增量备份的工具。配合任务计划，rsync 能实现定时或间隔同步，配合 inotify 或 sersync，可以实现触发式的实时同步。<br>rsync 可以实现 scp 的远程拷贝(rsync 不支持远程到远程的拷贝，但 scp 支持)、cp 的本地拷贝、rm 删除和”ls -l”显示文件列表等功能。但需要注意的是，rsync 的最终目的或者说其原始目的是实现两端主机的文件同步，因此实现的 scp/cp/rm 等功能仅仅只是同步的辅助手段，且 rsync 实现这些功能的方式和这些命令是不一样的。事实上，rsync 有一套自己的算法，其算法原理以及 rsync 对算法实现的机制可能比想象中要复杂一些。平时使用 rsync 实现简单的备份、同步等功能足以，没有多大必要去深究这些原理性的内容。但是想要看懂 rsync 命令的 man 文档、使用”-vvvv”分析 rsync 执行过程，以及实现 rsync 更强大更完整的功能，没有这些理论知识的支持是绝对不可能实现的。本篇文章将简单介绍 rsync 的使用方法和它常用的功能。在本篇文章之后的下几篇文章中，将介绍 inotify+rsync 和 sersync，再之后将详细解释 rsync 相关的原理，其中包括官方技术报告的翻译(即算法原理)、rsync 同步的整个过程(也是官方推荐文章的翻译)，然后专门使用一篇文章通过示例来详细解释 rsync 算法原理，最后给出 rsync 的 man 文档翻译。希望各位朋友能藉此深入 rsync。</p>
+<h1 id="同步基本说明"><a href="#同步基本说明" class="headerlink" title="同步基本说明"></a>同步基本说明</h1><p>rsync 的目的是实现本地主机和远程主机上的文件同步(包括本地推到远程，远程拉到本地两种同步方式)，也可以实现本地不同路径下文件的同步，但不能实现远程路径 1 到远程路径 2 之间的同步(scp 可以实现)。</p>
+<p>不考虑 rsync 的实现细节，就文件同步而言，涉及了源文件和目标文件的概念，还涉及了以哪边文件为同步基准。例如，想让目标主机上的文件和本地文件保持同步，则是以本地文件为同步基准，将本地文件作为源文件推送到目标主机上。反之，如果想让本地主机上的文件和目标主机上的文件保持同步，则目标主机上的文件为同步基准，实现方式是将目标主机上的文件作为源文件拉取到本地。当然，要保持本地的两个文件相互同步，rsync 也一样能实现，这就像 Linux 中 cp 命令一样，以本地某文件作为源，另一文件作为目标文件，但请注意，虽然 rsync 和 cp 能达到相同的目的，但它们的实现方式是不一样的。</p>
+<p>既然是文件同步，在同步过程中必然会涉及到源和目标两文件之间版本控制的问题，例如是否要删除源主机上没有但目标上多出来的文件，目标文件比源文件更新(newer than source)时是否仍要保持同步，遇到软链接时是拷贝软链接本身还是拷贝软链接所指向的文件，目标文件已存在时是否要先对其做个备份等等。</p>
+<p>rsync 同步过程中由两部分模式组成：决定哪些文件需要同步的检查模式以及文件同步时的同步模式。</p>
+<p>(1).检查模式是指按照指定规则来检查哪些文件需要被同步，例如哪些文件是明确被排除不传输的。默认情况下，rsync 使用”quick check”算法快速检查源文件和目标文件的大小、mtime(修改时间)是否一致，如果不一致则需要传输。当然，也可以通过在 rsync 命令行中指定某些选项来改变 quick check 的检查模式，比如”–size-only”选项表示”quick check”将仅检查文件大小不同的文件作为待传输文件。rsync 支持非常多的选项，其中检查模式的自定义性是非常有弹性的。</p>
+<p>(2).同步模式是指在文件确定要被同步后，在同步过程发生之前要做哪些额外工作。例如上文所说的是否要先删除源主机上没有但目标主机上有的文件，是否要先备份已存在的目标文件，是否要追踪链接文件等额外操作。rsync 也提供非常多的选项使得同步模式变得更具弹性。</p>
+<p>相对来说，为 rsync 手动指定同步模式的选项更常见一些，只有在有特殊需求时才指定检查模式，因为大多数检查模式选项都可能会影响 rsync 的性能。</p>
+<h1 id="三种工作方式"><a href="#三种工作方式" class="headerlink" title="三种工作方式"></a>三种工作方式</h1><p>rsync 的语法为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Local:  rsync [OPTION...] SRC... [DEST]</span><br><span class="line"> </span><br><span class="line">Access via remote shell:</span><br><span class="line">  Pull: rsync [OPTION...] [USER@]HOST:SRC... [DEST]</span><br><span class="line">  Push: rsync [OPTION...] SRC... [USER@]HOST:DEST</span><br><span class="line"> </span><br><span class="line">Access via rsync daemon:</span><br><span class="line">  Pull: rsync [OPTION...] [USER@]HOST::SRC... [DEST]</span><br><span class="line">        rsync [OPTION...] rsync://[USER@]HOST[:PORT]/SRC... [DEST]</span><br><span class="line">  Push: rsync [OPTION...] SRC... [USER@]HOST::DEST</span><br><span class="line">        rsync [OPTION...] SRC... rsync://[USER@]HOST[:PORT]/DEST</span><br></pre></td></tr></table></figure>
+
+<p>由此语法可知，rsync 有三种工作方式：</p>
+<p>(1).本地文件系统上实现同步。命令行语法格式为上述”Local”段的格式。</p>
+<p>(2).本地主机使用远程 shell 和远程主机通信。命令行语法格式为上述”Access via remote shell”段的格式。</p>
+<p>(3).本地主机通过网络套接字连接远程主机上的 rsync daemon。命令行语法格式为上述”Access via rsync daemon”段的格式。</p>
+<p>前两者的本质是通过管道通信，即使是远程 shell。而方式(3)则是让远程主机上运行 rsync 服务，使其监听在一个端口上，等待客户端的连接。</p>
+<p>但是，还有第四种工作方式：通过远程 shell 也能临时启动一个 rsync daemon，这不同于方式(3)，它不要求远程主机上事先启动 rsync 服务，而是临时派生出 rsync daemon，它是单用途的一次性 daemon，仅用于临时读取 daemon 的配置文件，当此次 rsync 同步完成，远程 shell 启动的 rsync daemon 进程也会自动消逝。此通信方式的命令行语法格式同”Access via rsync daemon”，但要求 options 部分必须明确指定”–rsh”选项或其短选项”-e”。</p>
+<p>以下是对 rsync 语法的简单说明，由于 rsync 支持一百多个选项，所以此处只介绍几个常用选项。完整的选项说明以及 rsync 的使用方法见我翻译的”man rsync”。</p>
+<p>其中，第一个路径参数一定是源文件路径，即作为同步基准的一方，可以同时指定多个源文件路径。最后一个路径参数则是目标文件路径，也就是待同步方。路径的格式可以是本地路径，也可以是使用 user@host:path 或 user@host::path 的远程路径，如果主机和 path 路径之间使用单个冒号隔开，表示使用的是远程 shell 通信方式，而使用双冒号隔开的则表示的是连接 rsync daemon。另外，连接 rsync daemon 时，还提供了 URL 格式的路径表述方式 rsync://user@host/path。</p>
+<p>如果仅有一个 SRC 或 DEST 参数，则将以类似于”ls -l”的方式列出源文件列表(只有一个路径参数，总会认为是源文件)，而不是复制文件。</p>
+<p>如果对 rsync 不熟悉，可暂先只了解本地以及远程 shell 格式的 user@host:path 路径格式。例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync /etc/fstab /tmp                # 在本地同步</span><br><span class="line">[root@xuexi ~]# rsync -r /etc 172.16.10.5:/tmp       # 将本地/etc目录拷贝到远程主机的/tmp下，以保证远程/tmp目录和本地/etc保持同步</span><br><span class="line">[root@xuexi ~]# rsync -r 172.16.10.5:/etc /tmp       # 将远程主机的/etc目录拷贝到本地/tmp下，以保证本地/tmp目录和远程/etc保持同步</span><br><span class="line">[root@xuexi ~]# rsync /etc/                          # 列出本地/etc/目录下的文件列表</span><br><span class="line">[root@xuexi ~]# rsync 172.16.10.5:/tmp/              # 列出远程主机上/tmp/目录下的文件列表</span><br></pre></td></tr></table></figure>
+
+<p>另外，使用 rsync 一定要注意的一点是，源路径如果是一个目录的话，带上尾随斜线和不带尾随斜线是不一样的，不带尾随斜线表示的是整个目录包括目录本身，带上尾随斜线表示的是目录中的文件，不包括目录本身。例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -a /etc /tmp</span><br><span class="line">[root@xuexi ~]# rsync -a /etc/ /tmp</span><br></pre></td></tr></table></figure>
+
+<p>第一个命令会在/tmp 目录下创建 etc 目录，而第二个命令不会在/tmp 目录下创建 etc 目录，源路径/etc/中的所有文件都直接放在/tmp 目录下。</p>
+<h1 id="选项说明与示例"><a href="#选项说明与示例" class="headerlink" title="选项说明与示例"></a>选项说明与示例</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">-v：显示rsync过程中详细信息。可以使用&quot;-vvvv&quot;获取更详细信息。</span><br><span class="line">-P：显示文件传输的进度信息。(实际上&quot;-P&quot;=&quot;--partial --progress&quot;，其中的&quot;--progress&quot;才是显示进度信息的)。</span><br><span class="line">-n --dry-run  ：仅测试传输，而不实际传输。常和&quot;-vvvv&quot;配合使用来查看rsync是如何工作的。</span><br><span class="line">-a --archive  ：归档模式，表示递归传输并保持文件属性。等同于&quot;-rtopgDl&quot;。</span><br><span class="line">-r --recursive：递归到目录中去。</span><br><span class="line">-t --times：保持mtime属性。强烈建议任何时候都加上&quot;-t&quot;，否则目标文件mtime会设置为系统时间，导致下次更新</span><br><span class="line">          ：检查出mtime不同从而导致增量传输无效。</span><br><span class="line">-o --owner：保持owner属性(属主)。</span><br><span class="line">-g --group：保持group属性(属组)。</span><br><span class="line">-p --perms：保持perms属性(权限，不包括特殊权限)。</span><br><span class="line">-D        ：是&quot;--device --specials&quot;选项的组合，即也拷贝设备文件和特殊文件。</span><br><span class="line">-l --links：如果文件是软链接文件，则拷贝软链接本身而非软链接所指向的对象。</span><br><span class="line">-z        ：传输时进行压缩提高效率。</span><br><span class="line">-R --relative：使用相对路径。意味着将命令行中指定的全路径而非路径最尾部的文件名发送给服务端，包括它们的属性。用法见下文示例。</span><br><span class="line">--size-only ：默认算法是检查文件大小和mtime不同的文件，使用此选项将只检查文件大小。</span><br><span class="line">-u --update ：仅在源mtime比目标已存在文件的mtime新时才拷贝。注意，该选项是接收端判断的，不会影响删除行为。</span><br><span class="line">-d --dirs   ：以不递归的方式拷贝目录本身。默认递归时，如果源为&quot;dir1/file1&quot;，则不会拷贝dir1目录，使用该选项将拷贝dir1但不拷贝file1。</span><br><span class="line">--max-size  ：限制rsync传输的最大文件大小。可以使用单位后缀，还可以是一个小数值(例如：&quot;--max-size=1.5m&quot;)</span><br><span class="line">--min-size  ：限制rsync传输的最小文件大小。这可以用于禁止传输小文件或那些垃圾文件。</span><br><span class="line">--exclude   ：指定排除规则来排除不需要传输的文件。</span><br><span class="line">--delete    ：以SRC为主，对DEST进行同步。多则删之，少则补之。注意&quot;--delete&quot;是在接收端执行的，所以它是在</span><br><span class="line">            ：exclude/include规则生效之后才执行的。</span><br><span class="line">-b --backup ：对目标上已存在的文件做一个备份，备份的文件名后默认使用&quot;~&quot;做后缀。</span><br><span class="line">--backup-dir：指定备份文件的保存路径。不指定时默认和待备份文件保存在同一目录下。</span><br><span class="line">-e          ：指定所要使用的远程shell程序，默认为ssh。</span><br><span class="line">--port      ：连接daemon时使用的端口号，默认为873端口。</span><br><span class="line">--password-file：daemon模式时的密码文件，可以从中读取密码实现非交互式。注意，这不是远程shell认证的密码，而是rsync模块认证的密码。</span><br><span class="line">-W --whole-file：rsync将不再使用增量传输，而是全量传输。在网络带宽高于磁盘带宽时，该选项比增量传输更高效。</span><br><span class="line">--existing  ：要求只更新目标端已存在的文件，目标端还不存在的文件不传输。注意，使用相对路径时如果上层目录不存在也不会传输。</span><br><span class="line">--ignore-existing：要求只更新目标端不存在的文件。和&quot;--existing&quot;结合使用有特殊功能，见下文示例。</span><br><span class="line">--remove-source-files：要求删除源端已经成功传输的文件。</span><br></pre></td></tr></table></figure>
+
+<p>rsync 的选项非常多，能够实现非常具有弹性的功能，以上选项仅仅只是很小一部分常用的选项，关于更完整更详细的选项说明，见我的 rsync man 手册翻译。</p>
+<p>虽然选项非常多，但最常用的选项组合是”avz”，即压缩和显示部分信息，并以归档模式传输。</p>
+<h2 id="基础示例"><a href="#基础示例" class="headerlink" title="基础示例"></a>基础示例</h2><p>以下是几个本地同步示例和通过远程 shell 实现的同步示例，示例中没有使用”-a”选项，目的是为了更清晰地说明各选项的作用。</p>
+<p><strong>(1).将/etc/fstab 拷贝到/tmp 目录下。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync /etc/fstab /tmp</span><br></pre></td></tr></table></figure>
+
+<p><strong>(2).将/etc/cron.d 目录拷贝到/tmp 下。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -r /etc/cron.d /tmp</span><br></pre></td></tr></table></figure>
+
+<p>该命令会在目标主机上创建/tmp/cron.d 目录，并将/etc/cron.d/中的文件放入到/tmp/cron.d/目录中，也就是说默认情况下，是不会在目录路径下创建上层目录/etc 的。</p>
+<p><strong>(3).将/etc/cron.d 目录拷贝到/tmp 下，但要求在/tmp 下也生成 etc 子目录。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -R -r /etc/cron.d /tmp</span><br></pre></td></tr></table></figure>
+
+<p>其中”-R”选项表示使用相对路径，此相对路径是以目标目录为根的。对于上面的示例，表示在目标上的/tmp 下创建 etc/cron.d 目录，即/tmp/etc/cron.d，etc/cron.d 的根”/“代表的就是目标/tmp。</p>
+<p>如果要拷贝的源路径较长，但只想在目标主机上保留一部分目录结构，例如要拷贝/var/log/anaconda/*到/tmp 下，但只想在/tmp 下保留从 log 开始的目录，如何操作？使用一个点代表相对路径的起始位置即可，也就是将长目录进行划分。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -R -r /var/./log/anaconda /tmp</span><br></pre></td></tr></table></figure>
+
+<p>这样，从点开始的目录都是相对路径，其相对根目录为目标路径。所以对于上面的示例，将在目标上创建/tmp/log/anaconda/*。</p>
+<p><strong>(4).对远程目录下已存在文件做一个备份。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -R -r --backup /var/./log/anaconda /tmp</span><br></pre></td></tr></table></figure>
+
+<p>这样在目标目录下，已存在的文件就被做一个备份，备份文件默认使用”~”做后缀，可以使用”–suffix”指定备份后缀。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi tmp]# ll log/anaconda/</span><br><span class="line">total 3112</span><br><span class="line">-rw------- 1 root root    6668 Jul 14 12:45 anaconda.log</span><br><span class="line">-rw------- 1 root root    6668 Jul 14 11:44 anaconda.log~</span><br><span class="line">-rw------- 1 root root    3826 Jul 14 12:45 ifcfg.log</span><br><span class="line">-rw------- 1 root root    3826 Jul 14 11:44 ifcfg.log~</span><br><span class="line">-rw------- 1 root root 1102699 Jul 14 12:45 journal.log</span><br><span class="line">-rw------- 1 root root 1102699 Jul 14 11:44 journal.log~</span><br><span class="line">-rw------- 1 root root       0 Jul 14 12:45 ks-script-1uLekR.log</span><br><span class="line">-rw------- 1 root root       0 Jul 14 11:44 ks-script-1uLekR.log~</span><br><span class="line">-rw------- 1 root root       0 Jul 14 12:45 ks-script-iGpl4q.log</span><br><span class="line">-rw------- 1 root root       0 Jul 14 11:44 ks-script-iGpl4q.log~</span><br><span class="line">-rw------- 1 root root  160420 Jul 14 12:45 packaging.log</span><br><span class="line">-rw------- 1 root root  160420 Jul 14 11:44 packaging.log~</span><br><span class="line">-rw------- 1 root root   27906 Jul 14 12:45 program.log</span><br><span class="line">-rw------- 1 root root   27906 Jul 14 11:44 program.log~</span><br><span class="line">-rw------- 1 root root   78001 Jul 14 12:45 storage.log</span><br><span class="line">-rw------- 1 root root   78001 Jul 14 11:44 storage.log~</span><br><span class="line">-rw------- 1 root root  197961 Jul 14 12:45 syslog</span><br><span class="line">-rw------- 1 root root  197961 Jul 14 11:44 syslog~</span><br></pre></td></tr></table></figure>
+
+<p>可以使用”–backup-dir”指定备份文件保存路径，但要求保存路径必须存在。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# mkdir /tmp/log_back</span><br><span class="line">[root@xuexi ~]# rsync -R -r --backup --backup-dir=/tmp/log_back /var/./log/anaconda /tmp</span><br></pre></td></tr></table></figure>
+
+<p>指定备份路径后，默认将不会加备份后缀，除非使用”–suffix”显式指定后缀，如”–suffix=~”。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi tmp]# tree /tmp/log_back/</span><br><span class="line">/tmp/log_back/</span><br><span class="line">└── log</span><br><span class="line">    └── anaconda</span><br><span class="line">        ├── anaconda.log</span><br><span class="line">        ├── ifcfg.log</span><br><span class="line">        ├── journal.log</span><br><span class="line">        ├── ks-script-1uLekR.log</span><br><span class="line">        ├── ks-script-iGpl4q.log</span><br><span class="line">        ├── packaging.log</span><br><span class="line">        ├── program.log</span><br><span class="line">        ├── storage.log</span><br><span class="line">        └── syslog</span><br></pre></td></tr></table></figure>
+
+<p><strong>(5).指定 ssh 连接参数，如端口、连接的用户、ssh 选项等。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi tmp]# &gt;~/.ssh/known_hosts   # 先清空host key以便下面的测试</span><br><span class="line"></span><br><span class="line">[root@xuexi tmp]# rsync -e &quot;ssh -p 22 -o StrictHostKeyChecking=no&quot; /etc/fstab 172.16.10.5:/tmp</span><br><span class="line">Warning: Permanently added &#x27;172.16.10.5&#x27; (RSA) to the list of known hosts.</span><br><span class="line">root@172.16.10.5&#x27;s password:</span><br></pre></td></tr></table></figure>
+
+<p>可见直接指定 ssh 参数是生效的。</p>
+<p><strong>(6).”–existing”和”–ignore-existing”</strong></p>
+<p>“–existing”是只更新目标端已存在的文件。</p>
+<p>目前/tmp/{a,b}目录中内容如下，bashrc 在 a 目录中，crontab 在 b 目录中，且 a 目录中多了一个 c 子目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# tree /tmp/&#123;a,b&#125;</span><br><span class="line">/tmp/a</span><br><span class="line">├── bashrc</span><br><span class="line">├── c</span><br><span class="line">│   └── find</span><br><span class="line">├── fstab</span><br><span class="line">├── profile</span><br><span class="line">└── rc.local</span><br><span class="line">/tmp/b</span><br><span class="line">├── crontab</span><br><span class="line">├── fstab</span><br><span class="line">├── profile</span><br><span class="line">└── rc.local</span><br><span class="line"> </span><br><span class="line">1 directory, 9 files</span><br></pre></td></tr></table></figure>
+
+<p>使用”–existing”选项使得只更新目标端已存在的文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -r -v --existing /tmp/a/ /tmp/b   </span><br><span class="line">sending incremental file list</span><br><span class="line">fstab</span><br><span class="line">profile</span><br><span class="line">rc.local</span><br><span class="line"> </span><br><span class="line">sent 2972 bytes  received 70 bytes  6084.00 bytes/sec</span><br><span class="line">total size is 204755  speedup is 67.31</span><br></pre></td></tr></table></figure>
+
+<p>结果只有 3 个目标上已存在的文件被更新了，由于目标上没有 c 目录，所以 c 目录中的文件也没有进行传输。</p>
+<p>而”–ignore-existing”是更新目标端不存在的文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -r -v --ignore-existing /tmp/a/ /tmp/b</span><br><span class="line">sending incremental file list</span><br><span class="line">bashrc</span><br><span class="line">c/</span><br><span class="line">c/find</span><br><span class="line"> </span><br><span class="line">sent 202271 bytes  received 54 bytes  404650.00 bytes/sec</span><br><span class="line">total size is 204755  speedup is 1.01</span><br></pre></td></tr></table></figure>
+
+<p>“–existing”和”–ignore-existing”结合使用时，有个特殊功效，当它们结合”–delete”使用的时候，文件不会传输，但会删除 receiver 端额外多出的文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mkdir a b</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> touch a/&#123;1..4&#125;.txt</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> touch b/a.log</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> rsync -nrv --delete a/ b/</span></span><br><span class="line">sending incremental file list</span><br><span class="line">deleting a.log</span><br><span class="line">1.txt</span><br><span class="line">2.txt</span><br><span class="line">3.txt</span><br><span class="line">4.txt</span><br><span class="line"> </span><br><span class="line">sent 118 bytes  received 33 bytes  302.00 bytes/sec</span><br><span class="line">total size is 0  speedup is 0.00 (DRY RUN)</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> rsync -nrv --existing --ignore-existing --delete a/ b/</span></span><br><span class="line">sending incremental file list</span><br><span class="line">deleting a.log</span><br><span class="line"> </span><br><span class="line">sent 106 bytes  received 21 bytes  254.00 bytes/sec</span><br><span class="line">total size is 0  speedup is 0.00 (DRY RUN)</span><br></pre></td></tr></table></figure>
+
+<p>实际上，”–existing”和”–ingore-existing”是传输规则，只会影响 receiver 要求让 sender 传输的文件列表，在 receiver 决定哪些文件需要传输之前的过程，是这两个选项无法掌控的，所以各种规则、”–delete”等操作都不会被这两个选项影响。</p>
+<p><strong>(7).”–remove-source-files”删除源端文件。</strong></p>
+<p>使用该选项后，源端已经更新成功的文件都会被删除，源端所有未传输或未传输成功的文件都不会被移除。未传输成功的原因有多种，如 exclude 排除了，”quick check”未选项该文件，传输中断等等。</p>
+<p>总之，显示在”rsync -v”被传输列表中的文件都会被移除。如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -r -v --remove-source-files /tmp/a/anaconda /tmp/a/audit /tmp   </span><br><span class="line">sending incremental file list</span><br><span class="line">anaconda/anaconda.log</span><br><span class="line">anaconda/ifcfg.log</span><br><span class="line">anaconda/journal.log</span><br><span class="line">anaconda/ks-script-1uLekR.log</span><br><span class="line">anaconda/ks-script-iGpl4q.log</span><br><span class="line">anaconda/packaging.log</span><br><span class="line">anaconda/program.log</span><br><span class="line">anaconda/storage.log</span><br><span class="line">anaconda/syslog</span><br><span class="line">audit/audit.log</span><br><span class="line"> </span><br><span class="line">sent 4806915 bytes  received 204 bytes  9614238.00 bytes/sec</span><br><span class="line">total size is 4805676  speedup is 1.00</span><br></pre></td></tr></table></figure>
+
+<p>上述显示出来的文件在源端全部被删除。</p>
+<h2 id="“–exclude”排除规则"><a href="#“–exclude”排除规则" class="headerlink" title="“–exclude”排除规则"></a>“–exclude”排除规则</h2><p>使用”–exclude”选项指定排除规则，排除那些不需要传输的文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi tmp]# rsync -r -v --exclude=&quot;anaconda/*.log&quot; /var/log/anaconda /var/log/audit /tmp</span><br><span class="line">sending incremental file list</span><br><span class="line">anaconda/</span><br><span class="line">anaconda/syslog</span><br><span class="line">audit/</span><br><span class="line">audit/audit.log</span><br><span class="line"> </span><br><span class="line">sent 3365629 bytes  received 58 bytes  6731374.00 bytes/sec</span><br><span class="line">total size is 3365016  speedup is 1.00</span><br></pre></td></tr></table></figure>
+
+<p>上例中只排除了 anaconda 目录中的 log 文件，但是 audit 目录中的 log 文件是正常传输的。</p>
+<p>注意，一个”–exclude”只能指定一条规则，要指定多条排除规则，需要使用多个”–exclude”选项，或者将排除规则写入到文件中，然后使用”–exclude-from”选项读取该规则文件。</p>
+<p>另外，除了”–exclude”排除规则，还有”–include”包含规则，顾名思义，它就是筛选出要进行传输的文件，所以 include 规则也称为传输规则。它的使用方法和”–exclude”一样。如果一个文件即能匹配排除规则，又能匹配包含规则，则先匹配到的立即生效，生效后就不再进行任何匹配。</p>
+<p>最后，关于规则，最重要的一点是它的作用时间。当发送端敲出 rsync 命令后，rsync 将立即扫描命令行中给定的文件和目录(扫描过程中还会按照目录进行排序，将同一个目录的文件放在相邻的位置)，这称为拷贝树(copy tree)，扫描完成后将待传输的文件或目录记录到文件列表中，然后将文件列表传输给接收端。而筛选规则的作用时刻是在扫描拷贝树时，所以会根据规则来匹配并决定文件是否记录到文件列表中(严格地说是会记录到文件列表中的，只不过排除的文件会被标记为 hide 隐藏起来)，只有记录到了文件列表中的文件或目录才是真正需要传输的内容。换句话说，筛选规则的生效时间在 rsync 整个同步过程中是非常靠前的，它会影响很多选项的操作对象，最典型的如”–delete”。也许，你看完这一整篇文章都没感觉到这一点的重要性，但如果你阅读 rsync 的 man 文档或者学习 rsync 的原理，你一定会深有体会。</p>
+<p>实际上，排除规则和包含规则都只是”–filter”筛选规则的两种特殊规则。”–filter”比较复杂，它有自己的规则语法和匹配模式，由于篇幅有限，以及考虑到本文的难度定位，”–filter”规则不便在此多做解释，仅简单说明下规则类，帮助理解下文的”–delete”。</p>
+<p>以下是 rsync 中的规则种类，不解之处请结合下文的”–delete”分析：</p>
+<p>(1).exclude 规则：即排除规则，只作用于发送端，被排除的文件不会进入文件列表(实际上是加上隐藏规则进行隐藏)。</p>
+<p>(2).include 规则：即包含规则，也称为传输规则，只作用于发送端，被包含的文件将明确记录到文件列表中。</p>
+<p>(3).hide 规则：即隐藏规则，只作用于发送端，隐藏后的文件对于接收端来说是看不见的，也就是说接收端会认为它不存在于源端。</p>
+<p>(4).show 规则：即显示规则，只作用于发送端，是隐藏规则的反向规则。</p>
+<p>(5).protect 规则：即保护规则，该规则只作用于接收端，被保护的文件不会被删除掉。</p>
+<p>(6).risk 规则：即取消保护规则。是 protect 的反向规则。</p>
+<p>除此之外，还有一种规则是”clear 规则”，作用是删除 include/exclude 规则列表。</p>
+<h2 id="如何一次写对-exclude-规则"><a href="#如何一次写对-exclude-规则" class="headerlink" title="如何一次写对 exclude 规则"></a>如何一次写对 exclude 规则</h2><p>很多人写不来规则，总发现写出来后没有生效，要写成功一次规则得要不断地进行调试、调试、调试，令人无比心烦。</p>
+<p>其实很多工具的规则写法是类似的，比如 tar 也一样。规则写好后不生效的原因一般有两种：绝对路径和相对路径的问题、尾随斜线的问题。</p>
+<p>一般来说，操作的路径是绝对路径，那么规则里必须也写绝对路径，而且必须写完整的绝对路径。操作的路径是相对路径，那么规则里必须写相对路径，从哪里开始相对可能和工具有关。比如要操作路径”/abc/def”，想要筛选 def 下的所有 txt 文件，必须写成”/abc/def/<em>.txt”，如果操作路径是”abc/def”，那么要筛选这个目录下的所有 txt 文件，可能需要写成”abc/def/</em>.txt”，也有可能写成”<em>.txt”，甚至写成”def/</em>.txt”，写成哪种形式依赖于这个软件如何解析相对路径。</p>
+<p>对于 rsync 来说，要更复杂一些，因为除了 bash 的相对路径外，它自身还提供了一个相对路径的解析规则，而且尾随斜线也会影响规则的写法。这就是为什么写 rsync 规则非常麻烦的原因。</p>
+<p>我这里提供一个判断规则写法的方式，纯属我个人的经验总结：使用”-n”选项是 dry run 模式，也就是只测试不传输，”-i”选项是输出要传输文件的路径。”-i”只是一个便捷性选项，可以替换成其它选项来自定义输出格式，有时候通过这些信息来做一些判断是非常有用的，具体的可以翻 man 手册。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root:~$ rsync -nr -i a b/</span><br><span class="line">cd+++++++++ a/</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ a/1.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ a/2.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ a/3.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ a/4.txt</span></span><br></pre></td></tr></table></figure>
+
+<p>这里已经显示了传输文件的路径”a/*”，也就是说包括了目录 a，且是相对路径的。所以要写规则时，需要加上这个 a 路径，比如下面的排除规则。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root:~$ rsync -nr -i --exclude=&quot;a/2.txt&quot;  a b/</span><br><span class="line">cd+++++++++ a/</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ a/1.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ a/3.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ a/4.txt</span></span><br><span class="line"></span><br><span class="line">root:~$ rsync -nr -i --exclude=&quot;a/*.txt&quot;  a b/</span><br><span class="line">cd+++++++++ a/</span><br></pre></td></tr></table></figure>
+
+<p>如果上面的传输路径 a 加上尾随斜线，再看-i 的输出路径信息，发现已经改变了：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root:~$ rsync -nr -i a/ b/</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ 1.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ 2.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ 3.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ 4.txt</span></span><br></pre></td></tr></table></figure>
+
+<p>所以这时的排除规则中不应该包含 a 目录前缀：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">root:~$ rsync -nr -i --exclude=&quot;2.txt&quot; ./a/ b/</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ 1.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ 3.txt</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">f+++++++++ 4.txt</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="“–delete”解释"><a href="#“–delete”解释" class="headerlink" title="“–delete”解释"></a>“–delete”解释</h2><p>使用”–delete”选项后，接收端的 rsync 会先删除目标目录下已经存在，但源端目录不存在的文件。也就是”多则删之，少则补之”。</p>
+<p>例如，先实现一次同步，再向目标目录中拷贝一个新文件，这样目标目录中就比源目录多出一个文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -r /etc/cron.d /tmp/</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# cp /etc/fstab /tmp/cron.d/</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# ls /tmp/cron.d/</span><br><span class="line">0hourly  fstab  raid-check  sysstat</span><br></pre></td></tr></table></figure>
+
+<p>再使用”–delete”选项，这时会将目标端多出的文件给删除掉，然后进行同步。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -r -v /etc/cron.d /tmp --delete</span><br><span class="line">sending incremental file list</span><br><span class="line">deleting cron.d/fstab</span><br><span class="line">cron.d/0hourly</span><br><span class="line">cron.d/raid-check</span><br><span class="line">cron.d/sysstat</span><br><span class="line"> </span><br><span class="line">sent 704 bytes  received 70 bytes  1548.00 bytes/sec</span><br><span class="line">total size is 471  speedup is 0.61</span><br></pre></td></tr></table></figure>
+
+<p>这样的行为实现了远程删除的功能，对于作用于本地的 rsync，也就实现了 rm 的本地删除功能。而且，如果使用空目录作为源目录，则它的作用是清空目录上的整个目录。</p>
+<p>如果将”–delete”选项和”–exclude”选项一起使用，则被排除的文件不会被删除。例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync -r /var/log/anaconda /var/log/audit /tmp  # 先进行一次同步以便测试</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# cp /etc/fstab /tmp/anaconda/                    # 拷贝一个新文件到目标目录以便测试</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# rsync -r -v --exclude=&quot;anaconda/*.log&quot; /var/log/anaconda /var/log/audit /tmp --delete</span><br><span class="line">sending incremental file list</span><br><span class="line">deleting anaconda/fstab</span><br><span class="line">anaconda/syslog</span><br><span class="line">audit/audit.log</span><br><span class="line"> </span><br><span class="line">sent 3406190 bytes  received 52 bytes  6812484.00 bytes/sec</span><br><span class="line">total size is 3405579  speedup is 1.00</span><br></pre></td></tr></table></figure>
+
+<p>结果发现只删除了”anaconda/fstab”文件，被”–exclude”规则匹配的 anaconda/*.log 文件都没有被删除。也就是网上所说的言论：exclude 排除的文件不会被删除。</p>
+<p>结论是没错的，但我想很多人不知道为何会如此，也可能从来没想过为何会如此，所以我简单地做个说明。</p>
+<p>在发送端将文件列表发送给接收端后，接收端的 generator(要是不知道，你认为是某个就好了)进程会扫描每个文件列表中的信息，然后对列表中的每个信息条目都计算数据块校验码，最后将数据库校验码发给发送端，发送端通过校验码来匹配哪些数据块是需要传输的，这样就实现了增量传输的功能——只传输改变的部分，不会传输整个文件。而 delete 删除的时间点是 generator 进程处理每个文件列表时、生成校验码之前进行的，先将目标上存在但源上不存在的多余文件删除，这样就无需为多余的文件生成校验码。</p>
+<p>所以，delete 动作是比”–exclude”规则更晚执行的，被”–exclude”规则排除的文件不会进入文件列表中，在执行了 delete 时会认为该文件不存在于源端，从而导致目标端将这些文件删除。但这是想当然的，尽管理论上确实是这样的，但是 rsync 为了防止众多误删除情况，提供了两种规则：保护规则(protect)和取消保护规则(risk)。默认情况下，”–delete”和”–exclude”一起使用时，虽然发送端的 exclude 规则将文件标记为隐藏，使得接收端认为这些被排除文件在源端不存在，但 rsync 会将这些隐藏文件标记为保护文件，使得它们不受 delete 行为的影响，这样 delete 就删除不了这些被排除的文件。如果还是想要强行删除被 exclude 排除的文件，可以使用”–delete-excluded”选项强制取消保护，这样即使被排除的文件也会被删除。</p>
+<p>那么现在，是否理解了网上的言论”exclude 排除的文件不会被删除”？</p>
+<p>除了”–delete”，相关的选项还有”–delete-before”、”–delete-during”、”–delete-delay”等，它们都隐含了”–delete”选项，它们分别表示 generator 处理各个文件列表之前一次性全部删除待删除文件、处理文件列表时处理到哪个文件列表就删除该文件列表中的待删除文件，以及同步完所有数据后一次性删除所有待删除文件。</p>
+<p>举个例子，假如源端要传输 3 个目录 a、b、c，在目标端 a 目录中有 a1、a2、a3 共 3 个文件需要被删除，b 目录中有 b1、b2、b3 需要删除，同理 c 目录也一样 c1、c2、c3 需要被删除。</p>
+<p>如果是”–delete-before”，则在目标端 rsync 刚启动时，就会把 a1-a3、b1-b3、c1-c3 一次性删除，然后才会处理文件列表中的 a 目录，处理完 a 后处理 b，再是 c。</p>
+<p>如果是”–delete-during”，则在目标端 rsync 刚启动时，先处理文件列表中的 a 目录，处理 a 目录时发现此目录中有待删除文件 a1-a3，顺手就删除它们，然后完成 a 目录的相关操作，再处理文件列表中的 b 目录，发现也有待删除文件 b1-b3，顺手删除它们，同理 c1-c3 也如此。</p>
+<p>如果是”–delete-delay”，则同步完文件列表中的 a/b/c 目录后，最后一次性删除 a1-a3、b1-b3、c1-c3。</p>
+<p>其实”–delete”选项大多数情况下默认采用的就是”–delete-during”。</p>
+<h1 id="rsync-daemon-模式"><a href="#rsync-daemon-模式" class="headerlink" title="rsync daemon 模式"></a>rsync daemon 模式</h1><p>既然 rsync 通过远程 shell 就能实现两端主机上的文件同步，还要使用 rsync 的服务干啥？试想下，你有的机器上有一堆文件需要时不时地同步到众多机器上去，比如目录 a、b、c 是专门传输到 web 服务器上的，d/e、f、g/h 是专门传输到 ftp 服务器上的，还要对这些目录中的某些文件进行排除，如果通过远程 shell 连接方式，无论是使用排除规则还是包含规则，甚至一条一条 rsync 命令地传输，这都没问题，但太过繁琐且每次都要输入同样的命令显得太死板。使用 rsync daemon 就可以解决这种死板问题。而且，rsync daemon 是向外提供服务的，这样只要告诉了别人 rsync 的 url 路径，外人就能向 ftp 服务器一样获取文件列表并进行选择性地下载，所以，你所制定的列表，你的同事也可以获取到并使用。</p>
+<p>举个简单的例子，Linux 内核官网 <a target="_blank" rel="noopener" href="http://www.kernel.org/">www.kernel.org</a> 提供 rsync 的下载方式，官方给出的地址是 rsync://rsync.kernel.org/pub，可以根据这个地址找出你想下载的内核版本。例如要找出 linux-3.0.15 版本的内核相关文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync --no-motd -r -v -f &quot;+ */&quot; -f &quot;+ linux-3.0.15*&quot; -f &quot;- *&quot; -m rsync://rsync.kernel.org/pub/</span><br><span class="line">receiving file list ... done</span><br><span class="line">drwxr-xr-x         124 2017/07/14 20:27:22 .</span><br><span class="line">drwxr-xr-x         178 2014/11/12 05:50:10 linux</span><br><span class="line">drwxr-xr-x        4096 2017/06/27 05:46:27 linux/kernel</span><br><span class="line">drwxr-xr-x      237568 2017/07/05 20:49:33 linux/kernel/v3.x</span><br><span class="line">-rw-r--r--    76803806 2012/01/04 03:00:31 linux/kernel/v3.x/linux-3.0.15.tar.bz2</span><br><span class="line">-rw-r--r--    96726195 2012/01/04 03:00:31 linux/kernel/v3.x/linux-3.0.15.tar.gz</span><br><span class="line">-rw-r--r--         836 2012/01/04 03:00:31 linux/kernel/v3.x/linux-3.0.15.tar.sign</span><br><span class="line">-rw-r--r--    63812604 2012/01/04 03:00:31 linux/kernel/v3.x/linux-3.0.15.tar.xz</span><br><span class="line"> </span><br><span class="line">sent 59 bytes  received 80.19K bytes  12.35K bytes/sec</span><br><span class="line">total size is 237.34M  speedup is 2957.66</span><br></pre></td></tr></table></figure>
+
+<p>你无需关注上面的规则代表什么意思，需要关注的重点是通过 rsync 可以向外提供文件列表并提供相应的下载。</p>
+<p>同样，你还可以根据路径，将 rsync daemon 上的文件拉取到本地实现下载的功能。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync --no-motd -avzP rsync://rsync.kernel.org/pub/linux/kernel/v3.x/linux-3.0.15.tar.bz2 /tmp</span><br><span class="line">receiving incremental file list</span><br><span class="line">linux-3.0.15.tar.bz2</span><br><span class="line">     2834426   3%   300.51kB/s    0:40:22</span><br></pre></td></tr></table></figure>
+
+<p>下面就来介绍下 rsync daemon。</p>
+<p>rsync daemon 是”rsync –daemon”或再加上其他一些选项启动的，它会读取配置文件，默认是/etc/rsyncd.conf，并默认监听在 873 端口上，当外界有客户端对此端口发起连接请求，通过这个网络套接字就可以完成连接，以后与该客户端通信的所有数据都通过该网络套接字传输。</p>
+<p>rsync daemon 的通信方式和传输通道与远程 shell 不同。远程 shell 连接的两端是通过管道完成通信和数据传输的，即使连接的一端是远程主机，当连接到目标端时，将在目标端上根据远程 shell 进程 fork 出 rsync 进程使其成为 rsync server。而 rsync daemon 是事先在 server 端上运行好的 rsync 后台进程(根据启动选项，也可以设置为非后台进程)，它监听套接字等待 client 端的连接，连接建立后所有通信方式都是通过套接字完成的。</p>
+<p>注意，rsync 中的 server 的概念从来就不代表是 rsync daemon，server 在 rsync 中只是一种通用称呼，只要不是发起 rsync 请求的 client 端，就是 server 端，你可以认为 rsync daemon 是一种特殊的 server，其实 daemon 更应该称之为 service。(之所以解释这一点，是避免各位初学的朋友在阅读 man rsync 过程中产生误解)</p>
+<p>以下是 rsync client 连接 rsync daemon 时的命令语法：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Pull: rsync [OPTION...] [USER@]HOST::SRC... [DEST]</span><br><span class="line">      rsync [OPTION...] rsync://[USER@]HOST[:PORT]/SRC... [DEST]</span><br><span class="line">Push: rsync [OPTION...] SRC... [USER@]HOST::DEST</span><br><span class="line">      rsync [OPTION...] SRC... rsync://[USER@]HOST[:PORT]/DEST</span><br></pre></td></tr></table></figure>
+
+<p>连接命令有两种类型，一种是 rsync 风格使用双冒号的”rsync user@host::src dest”，一种是 url 风格的”rsync://user@host:port/src dest”。对于 rsync 风格的连接命令，如果想要指定端口号，则需要使用选项”–port”。</p>
+<p>上述语法中，其中 daemon 端的路径，如 user@host::src，它的 src 代表的是模块名，而不是真的文件系统中的路径。关于 rsync 中的模块，相信见了下面的配置文件就会知道是什么意思。</p>
+<h2 id="daemon-配置文件-rsyncd-conf"><a href="#daemon-配置文件-rsyncd-conf" class="headerlink" title="daemon 配置文件 rsyncd.conf"></a>daemon 配置文件 rsyncd.conf</h2><p>默认”rsync –daemon”读取的配置文件为/etc/rsyncd.conf，有些版本的系统上可能该文件默认不存在。rsyncd.conf 的配置见 man rsyncd.conf。以下是部分内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# cat /etc/rsyncd.conf</span><br><span class="line"><span class="meta">#</span><span class="bash"> /etc/rsyncd: configuration file <span class="keyword">for</span> rsync daemon mode</span></span><br><span class="line"><span class="meta"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> See rsyncd.conf man page <span class="keyword">for</span> more options.</span></span><br><span class="line"><span class="meta"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> configuration example:</span></span><br><span class="line"><span class="meta"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> uid = nobody</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> gid = nobody</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> use chroot = yes</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> max connections = 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> pid file = /var/run/rsyncd.pid</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> exclude = lost+found/</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> transfer logging = yes</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> timeout = 900</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ignore nonreadable = yes</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> dont compress   = *.gz *.tgz *.zip *.z *.Z *.rpm *.deb *.bz2</span></span><br><span class="line"><span class="meta"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> [ftp1]</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        path = /home/ftp</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        comment = ftp <span class="built_in">export</span> area</span></span><br></pre></td></tr></table></figure>
+
+<p>在上述示例配置文件中，先定义了一些全局选项，然后定义了[ftp1]，这个用中括号包围的”[ftp1]”就是 rsync 中所谓的模块，ftp1 为模块 ID，必须保证唯一，每个模块中必须定义一项”path”，path 定义的是该模块代表的路径，例如此示例文件中，如果想请求 ftp1 模块，则在客户端使用”rsync user@host::ftp1”，这表示访问 user@host 上的/home/ftp 目录，如果要访问/home/ftp 目录下的子目录 www，则”rsync user@host::ftp1/www”。</p>
+<p>以下是常见的配置项，也算是一个配置示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">######## 全局配置参数 ##########</span></span></span><br><span class="line">port=888    # 指定rsync端口。默认873</span><br><span class="line">uid = rsync # rsync服务的运行用户，默认是nobody，文件传输成功后属主将是这个uid</span><br><span class="line">gid = rsync # rsync服务的运行组，默认是nobody，文件传输成功后属组将是这个gid</span><br><span class="line">use chroot = no # rsync daemon在传输前是否切换到指定的path目录下，并将其监禁在内</span><br><span class="line">max connections = 200 # 指定最大连接数量，0表示没有限制</span><br><span class="line">timeout = 300         # 确保rsync服务器不会永远等待一个崩溃的客户端，0表示永远等待</span><br><span class="line">motd file = /var/rsyncd/rsync.motd   # 客户端连接过来显示的消息</span><br><span class="line">pid file = /var/run/rsyncd.pid       # 指定rsync daemon的pid文件</span><br><span class="line">lock file = /var/run/rsync.lock      # 指定锁文件</span><br><span class="line">log file = /var/log/rsyncd.log       # 指定rsync的日志文件，而不把日志发送给syslog</span><br><span class="line">dont compress = *.gz *.tgz *.zip *.z *.Z *.rpm *.deb *.bz2  # 指定哪些文件不用进行压缩传输</span><br><span class="line"><span class="meta"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##########下面指定模块，并设定模块配置参数，可以创建多个模块###########</span></span></span><br><span class="line">[longshuai]        # 模块ID</span><br><span class="line">path = /longshuai/ # 指定该模块的路径，该参数必须指定。启动rsync服务前该目录必须存在。rsync请求访问模块本质就是访问该路径。</span><br><span class="line">ignore errors      # 忽略某些IO错误信息</span><br><span class="line">read only = false  # 指定该模块是否可读写，即能否上传文件，false表示可读写，true表示可读不可写。所有模块默认不可上传</span><br><span class="line">write only = false # 指定该模式是否支持下载，设置为true表示客户端不能下载。所有模块默认可下载</span><br><span class="line">list = false       # 客户端请求显示模块列表时，该模块是否显示出来，设置为false则该模块为隐藏模块。默认true</span><br><span class="line">hosts allow = 10.0.0.0/24 # 指定允许连接到该模块的机器，多个ip用空格隔开或者设置区间</span><br><span class="line">hosts deny = 0.0.0.0/32   # 指定不允许连接到该模块的机器</span><br><span class="line">auth users = rsync_backup # 指定连接到该模块的用户列表，只有列表里的用户才能连接到模块，用户名和对应密码保存在secrts file中，</span><br><span class="line">                          # 这里使用的不是系统用户，而是虚拟用户。不设置时，默认所有用户都能连接，但使用的是匿名连接</span><br><span class="line">secrets file = /etc/rsyncd.passwd # 保存auth users用户列表的用户名和密码，每行包含一个username:passwd。由于&quot;strict modes&quot;</span><br><span class="line">                                  # 默认为true，所以此文件要求非rsync daemon用户不可读写。只有启用了auth users该选项才有效。</span><br><span class="line">[xiaofang]    # 以下定义的是第二个模块</span><br><span class="line">path=/xiaofang/</span><br><span class="line">read only = false</span><br><span class="line">ignore errors</span><br><span class="line">comment = anyone can access</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<p>(1).客户端推到服务端时，文件的属主和属组是配置文件中指定的 uid 和 gid。但是客户端从服务端拉的时候，文件的属主和属组是客户端正在操作 rsync 的用户身份，因为执行 rsync 程序的用户为当前用户。</p>
+<p>(2).auth users 和 secrets file 这两行不是一定需要的，省略它们时将默认使用匿名连接。但是如果使用了它们，则 secrets file 的权限必须是 600。客户端的密码文件也必须是 600。</p>
+<p>(3).关于 secrets file 的权限，实际上并非一定是 600，只要满足除了运行 rsync daemon 的用户可读即可。是否检查权限的设定是通过选项 strict mode 设置的，如果设置为 false，则无需关注文件的权限。但默认是 yes，即需要设置权限。</p>
+<p>配置完后，再就是提供模块相关目录、身份验证文件等。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# useradd -r -s /sbin/nologin rsync</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# mkdir /&#123;longshuai,xiaofang&#125;</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# chown -R rsync.rsync /&#123;longshuai,xiaofang&#125;</span><br></pre></td></tr></table></figure>
+
+<p>提供模块 longshuai 身份验证文件，由于 rsync daemon 是以 root 身份运行的，所以要求身份验证文件对非 root 用户不可读写，所以设置为 600 权限。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# echo &quot;rsync_backup:123456&quot; &gt;&gt; /etc/rsyncd.passwd</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# chmod 600 /etc/rsyncd.passwd </span><br></pre></td></tr></table></figure>
+
+<p>然后启动 rsync daemon，启动方式很简单。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync --daemon</span><br></pre></td></tr></table></figure>
+
+<p>如果是 CentOS 7，则自带启动脚本。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@xuexi ~]# systemctl start rsyncd</span><br></pre></td></tr></table></figure>
+
+<p>看看该脚本的内容。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# cat /usr/lib/systemd/system/rsyncd.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=fast remote file copy program daemon</span><br><span class="line">ConditionPathExists=/etc/rsyncd.conf</span><br><span class="line"> </span><br><span class="line">[Service]</span><br><span class="line">EnvironmentFile=/etc/sysconfig/rsyncd</span><br><span class="line">ExecStart=/usr/bin/rsync --daemon --no-detach &quot;$OPTIONS&quot;</span><br><span class="line"> </span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+
+<p>可以看到启动方法也仅仅只是多了一个”–no-detach”，该选项表示 rsync 不将自己从终端上剥离。</p>
+<p>总之，启动好 rysnc daemon 后，它就监听在指定的端口上，等待客户端的连接。</p>
+<p>由于上述示例中的模块 longshuai 配置了身份验证功能，所以客户端连接时会询问密码。如果不想手动输入密码，则可以使用”–password-file”选项提供密码文件，密码文件中只有第一行才是传递的密码，其余所有的行都会被自动忽略。</p>
+<p>例如在客户端上：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# echo &quot;123456&quot; &gt; /tmp/rsync_passwd</span><br></pre></td></tr></table></figure>
+
+<p>然后使用该”–password-file”连接需要身份验证的 longshuai 模块。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# echo &quot;123456&quot; &gt; /tmp/rsync_passwd</span><br></pre></td></tr></table></figure>
+
+<p>如果需要访问模块中的某个文件，则：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync --list-only --port 888 rsync_backup@172.16.l0.6::longshuai/a/b --password-file=/tmp/rsync_passwd</span><br></pre></td></tr></table></figure>
+
+<p>还可以使用 url 格式语法：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync --list-only rsync://rsync_backup@172.16.l0.6:888/longshuai/a/b --password-file=/tmp/rsync_passwd</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="远程-shell-方式连接使用-daemon"><a href="#远程-shell-方式连接使用-daemon" class="headerlink" title="远程 shell 方式连接使用 daemon"></a>远程 shell 方式连接使用 daemon</h1><p>在前文说了 rsync 有三种工作方式：本地同步模式、远程 shell 模式和 rsync daemon 模式。前两者是使用管道进行通信和传输数据的，后者是通过网络套接字进行通信和传输数据的，且 rsync daemon 要求在 server 端必须已经运行好 rsync 且监听在指定端口上。</p>
+<p>但 rsync 支持第 4 种工作方式：通过远程 shell 方式连接 rsync daemon。也就是将第二种和第三种方式结合起来。虽然这种方式用的不多，但还是有必要稍微解释下，为你阅读 rsync 的 man 文档提供一些帮助。</p>
+<p>为了下面称呼的方便，暂且将通过远程 shell 连接使用 daemon 的方式成为”远程 shell daemon”，当然，官方并没有这样的术语，仅仅只是本人在此为了方便而如此称呼。</p>
+<p>远程 shell daemon 的方式严格地说是”远程 shell 通信方式 + 使用 rsync daemon 的功能”。所以它的通信方式和远程 shell 是一样的，在客户端发起远程 shell 连接，在 server 端 fork 远程 shell 进程以启动 rsync 进程，但这个 rsync 进程是临时的 rsync daemon，它只读取配置文件中 client 所请求的模块部分，且只读取模块部分中的 path 和身份认证相关内容，(也就是说不会将全局配置项和其它模块项加载到内存，该模块下的其他配置也不会生效)，当 rsync 操作完成，该 rsync daemon 就消逝并从内存中被清理。而且，远程 shell daemon 启动的临时 daemon 不会和已经在 server 端运行的 rsync daemon 冲突，它们可以并存。由于远程 shell 连接的最终目标是 rsync 模块，所以它只能使用 rsync daemon 语法。</p>
+<p>以下是语法格式：为了简洁，没有指定 src 还是 dest，且以 ssh 这个远程 shell 为例。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rsync [options] --rsh=ssh auth_user@host::module</span><br><span class="line"></span><br><span class="line">rsync [options] --rsh=&quot;ssh -l ssh_user&quot; auth_user@host::module</span><br><span class="line"></span><br><span class="line">rsync [options] -e &quot;ssh -l ssh_user&quot; auth_user@host::module</span><br><span class="line"></span><br><span class="line">rsync [options] -e &quot;ssh -l ssh_user&quot; rsync://auth_user@host/module</span><br></pre></td></tr></table></figure>
+
+<p>涉及了两个用户 ssh_user 和 auth_user，由于使用的是远程 shell 通信方式，所以 client 要和 server 端建立 ssh 连接，ssh_user 就是 ssh 连接 server 的用户。auth_user 则是模块中的身份认证用户。如果不指定”ssh_user”，则默认将使用 auth_user，但很多时候 auth_user 都只是一个虚拟用户，这样就建立不了 ssh 连接导致失败，所以建议明确指定 ssh_user 和 auth_user。</p>
+<p>举个例子就能说明上面的一切。以下是 server 端配置文件/etc/rsyncd.conf 中的一个模块配置，稍后将从 client 端使用远程 shell 方式请求该模块。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[tmpdir]</span><br><span class="line">path=/tmp</span><br><span class="line">auth users=lisi</span><br><span class="line">secrets file=/tmp/lisi_passwd</span><br></pre></td></tr></table></figure>
+
+<p>当前 server 端是没有 rsync daemon 在运行的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# netstat -tnl</span><br><span class="line">Active Internet connections (only servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State   </span><br><span class="line">tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN  </span><br><span class="line">tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN  </span><br><span class="line">tcp6       0      0 :::22                   :::*                    LISTEN  </span><br><span class="line">tcp6       0      0 ::1:25                  :::*                    LISTEN</span><br></pre></td></tr></table></figure>
+
+<p>在客户端上使用以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rsync --list-only -e &quot;ssh -l root&quot; lisi@172.16.10.6::tmpdir</span><br><span class="line">root@172.16.10.6&#x27;s password:</span><br><span class="line"> </span><br><span class="line">Password:</span><br></pre></td></tr></table></figure>
+
+<p>可以看到要求输入两次密码，第一次密码是 root@XXX 的密码，即建立 ssh 连接使用的密码，只有建立了 ssh 连接，才能在 server 上启动临时 rsync daemon。第二次输入的密码 Password 是”auth users=lisi”对应的密码。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/"># 技术工具</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/21/stress%E4%BD%BF%E7%94%A8%E7%AE%80%E4%BB%8B/">stress命令使用简介</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/21/Vim%E7%9A%84%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE/">vim 的基本配置</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

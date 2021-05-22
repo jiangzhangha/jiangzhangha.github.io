@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>正则表达式使用简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">正则表达式使用简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 21, 2021&nbsp;&nbsp;23:11:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h1><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><table>
+<thead>
+<tr>
+<th>字符</th>
+<th>含义</th>
+<th>举例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.</td>
+<td>匹配任意一个字符</td>
+<td>如“abc.”，可以匹配 abc2、abcd、abc% 等</td>
+</tr>
+<tr>
+<td>[]</td>
+<td>匹配括号中的任意一个字符</td>
+<td>如“[abc]d”，可以匹配 ad、bd、cd</td>
+</tr>
+<tr>
+<td>-</td>
+<td>在[]括号范围内表示范围</td>
+<td>如“[0-9]”，表示匹配 0 至 9 中任意一个数字</td>
+</tr>
+<tr>
+<td>^</td>
+<td>位于[]内开头，匹配除括号内字符以外的任意字符</td>
+<td>如“[^ab]”，表示匹配除了 a、b 之外的其他字符</td>
+</tr>
+<tr>
+<td>?</td>
+<td>紧跟其前面的单元匹配零次或者一次</td>
+<td></td>
+</tr>
+<tr>
+<td>+</td>
+<td>紧跟其前面的单元匹配一次或者多次</td>
+<td></td>
+</tr>
+<tr>
+<td>*</td>
+<td>紧跟其前面的单元匹配零次或者多次</td>
+<td></td>
+</tr>
+<tr>
+<td>{N}</td>
+<td>紧跟其前面的单元匹配精确的 N 次</td>
+<td>如“k{3}”，表示精确匹配 kkk。</td>
+</tr>
+<tr>
+<td>{N,}</td>
+<td>紧跟其前面的单元匹配至少 N 次</td>
+<td></td>
+</tr>
+<tr>
+<td>{,M}</td>
+<td>紧跟其前面的单元匹配最多 M 次</td>
+<td></td>
+</tr>
+<tr>
+<td>{N,M}</td>
+<td>紧跟其前面的单元匹配至少 N 次，最多 M 次</td>
+<td></td>
+</tr>
+<tr>
+<td>^</td>
+<td>匹配行首的位置</td>
+<td></td>
+</tr>
+<tr>
+<td>$</td>
+<td>匹配行尾的位置</td>
+<td></td>
+</tr>
+<tr>
+<td>\&lt;</td>
+<td>匹配单词开头的位置</td>
+<td></td>
+</tr>
+<tr>
+<td>\&gt;</td>
+<td>匹配单词结尾的位置</td>
+<td></td>
+</tr>
+<tr>
+<td>\b</td>
+<td>匹配单词的边界</td>
+<td>如“\bA.{3}T\b”，表示匹配类似 A123t、AXYZT 等单词</td>
+</tr>
+<tr>
+<td>\B</td>
+<td>匹配非单词边界</td>
+<td>如“\Bh\B”，表示匹配的 h 不在单词边界，如 host 则不符合，因为 h 在单词的边界，而 she 则符合匹配。</td>
+</tr>
+<tr>
+<td>&#124;</td>
+<td>连接两个子表达式，表示或的关系</td>
+<td>如“n(ei&#124;mn)”，匹配 nei 或者 nmn</td>
+</tr>
+<tr>
+<td>()</td>
+<td>将正则表达式部分组成分组，可引用分组</td>
+<td></td>
+</tr>
+<tr>
+<td>\</td>
+<td>转义字符</td>
+<td></td>
+</tr>
+<tr>
+<td>\d</td>
+<td>匹配数字字符，效果同[0-9]</td>
+<td></td>
+</tr>
+<tr>
+<td>\D</td>
+<td>匹配非数字字符，效果同[^0-9]，或者同[^\d]</td>
+<td></td>
+</tr>
+<tr>
+<td>\w</td>
+<td>匹配单词字符，效果同[_a-zA-Z0-9]</td>
+<td></td>
+</tr>
+<tr>
+<td>\W</td>
+<td>匹配非单词字符</td>
+<td></td>
+</tr>
+<tr>
+<td>\s</td>
+<td>匹配空白字符，效果同[ \t\n\r]，注意括号中包括空格</td>
+<td></td>
+</tr>
+<tr>
+<td>\S</td>
+<td>匹配非空白字符</td>
+<td></td>
+</tr>
+<tr>
+<td>()</td>
+<td>分组、子模式（subpattern）</td>
+<td></td>
+</tr>
+<tr>
+<td>\1、\2…</td>
+<td>通过后向引用重用捕获内容</td>
+<td>如“(the)(china people) \2 \1”，这里的第一个分组是 the、第二个分组是 china people，则\1 表示第一个分组，\2 表示第二个分组。</td>
+</tr>
+<tr>
+<td>(?:name)</td>
+<td>非捕获分组</td>
+<td>如“(?:the&#124;THE)”，非捕获分组不会将其存储在内存，无法后向引用</td>
+</tr>
+</tbody></table>
+<h2 id="C-语言实现正则表达式"><a href="#C-语言实现正则表达式" class="headerlink" title="C 语言实现正则表达式"></a>C 语言实现正则表达式</h2><p>标准的 C 与 C++ 都不支持正则表达式，但是在某些场景下，正则表达式存在可以为程序带来便利。</p>
+<p>在 C 语言中，一些库函数可以帮助我们实现在 C 中使用正则表达式的诉求。</p>
+<p>以下介绍在 Linux 环境下 C 语言中处理正则表达式的常用函数。</p>
+<h3 id="regcomp-函数"><a href="#regcomp-函数" class="headerlink" title="regcomp 函数"></a>regcomp 函数</h3><p>函数原型为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;regex.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">regcomp</span><span class="params">(<span class="keyword">regex_t</span> *compiled, <span class="keyword">const</span> <span class="keyword">char</span> *pattern, <span class="keyword">int</span> cflags)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>函数作用：将指定的正则表达式格式 pattern 编译成一种特定的数据格式 compiled，这样可以使得正则表达式的匹配更加有效。函数执行成功返回 0。</p>
+<p>参数说明：</p>
+<ol>
+<li><p>regex_t 是一个结构体数据类型，用来存放编译后的正则表达式，其成员 re_nsub 用来存储正则表达式组合的子正则表达式的个数。</p>
+</li>
+<li><p>pattern 指向要编译的正则表达式字符串。</p>
+</li>
+<li><p>cflags 是标志位。可以取值为：</p>
+<p>a、REG_EXTENDED：以功能更加强大的扩展正则表达式的方式进行匹配</p>
+<p>b、REG_ICASE：匹配字母时，忽略大小写；</p>
+<p>c、REG_NOSUB：不用存储匹配后的结果；</p>
+<p>d、REG_NEWLINE：识别换行符，则符号 ^ 与 $ 可以分别从行首与行尾开始匹配。</p>
+</li>
+</ol>
+<h3 id="regexec-函数"><a href="#regexec-函数" class="headerlink" title="regexec 函数"></a>regexec 函数</h3><p>函数原型为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;regex.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">regexec</span><span class="params">(<span class="keyword">regex_t</span> *compiled, <span class="keyword">char</span> *<span class="built_in">string</span>, <span class="keyword">size_t</span> nmatch, <span class="keyword">regmatch_t</span> matchptr[], <span class="keyword">int</span> eflags)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>函数作用：使用正则表达式执行匹配目标文本。如果在调用函数 regcomp 编译正则表达式时，没有指定 cflags 标志位为 REG_NEWLINE，则默认情况下忽略换行符，即将整个文本内的字符串当作一个整体来处理。函数执行成功返回 0。</p>
+<p>参数说明：</p>
+<ol>
+<li>compiled 是使用函数 regcomp 编译好的正则表达式；</li>
+<li>string 是需要匹配的目标字符串；</li>
+<li>nmatch 是 regmatch_t 结构体数组的长度；</li>
+<li>matchptr 是 regmatch_t 类型的结构体数组，存放匹配字符串的位置信息；</li>
+<li>eflags 取值为 REG_NOTBOL，即让特殊字符 ^ 无作用，eflags 取值为 REG_NOTEOL，即让特殊字符 $ 无作用。</li>
+</ol>
+<p>regmatch_t 是一个结构体数据类型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">regoff_t</span> rm_so;		<span class="comment">/* 存放匹配字符串在目标字符串中的起始位置 */</span></span><br><span class="line">    <span class="keyword">regoff_t</span> rm_eo;		<span class="comment">/* 存放匹配字符串在目标字符串中的结束位置 */</span></span><br><span class="line">&#125; <span class="keyword">regmatch_t</span>;</span><br><span class="line"><span class="comment">/* 通常以数组的形式定义一组regmatch_t结构，因为往往正则表达式中还包含子正则表达式，即存在分组</span></span><br><span class="line"><span class="comment">   数组0单元存放主正则表达式的位置</span></span><br><span class="line"><span class="comment">   数组1、2、3...依次存放子正则表达式的位置 */</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="regfree-函数"><a href="#regfree-函数" class="headerlink" title="regfree 函数"></a>regfree 函数</h3><p>函数原型为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;regex.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">regfree</span><span class="params">(<span class="keyword">regex_t</span> *compiled)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>函数作用：使用完编译好的正则表达式后，或者需要重新编译其他的正则表达式时，需要使用函数 regfree 清空 compiled 指向的结构体内容。</p>
+<h3 id="regerror-函数"><a href="#regerror-函数" class="headerlink" title="regerror 函数"></a>regerror 函数</h3><p>函数原型为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;regex.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">size_t</span> <span class="title">regerror</span><span class="params">(<span class="keyword">int</span> errcode, <span class="keyword">regex_t</span> *compiled, <span class="keyword">char</span> *buffer, <span class="keyword">size_t</span> length)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>函数作用：当执行 regexec 或者 regcomp 产生错误的时候，可以调用函数 regerror 以返回一个包含错误信息的字符串。</p>
+<p>参数说明：</p>
+<ol>
+<li>errcode 是由函数 regexec 或者 regcomp 返回的错误代号；</li>
+<li>compiled 是已经编译好的正则表达式，其值可以为 NULL；</li>
+<li>buffer 指向用来存放错误信息的字符串内存空间；</li>
+<li>length 指明 buffer 的长度，如果错误信息的长度大于该值，则函数自动截断超出的字符串。</li>
+</ol>
+<h3 id="范例"><a href="#范例" class="headerlink" title="范例"></a>范例</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;regex.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">my_match</span><span class="params">(<span class="keyword">char</span>* pattern,<span class="keyword">char</span>* buf)</span></span>&#123;</span><br><span class="line">  <span class="keyword">int</span> status,i;</span><br><span class="line">  <span class="keyword">int</span> flag=REG_EXTENDED;</span><br><span class="line">  <span class="keyword">regmatch_t</span> pmatch[<span class="number">1</span>];</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">size_t</span> nmatch=<span class="number">1</span>;</span><br><span class="line">  <span class="keyword">regex_t</span>  reg;</span><br><span class="line">  <span class="comment">//编译正则模式</span></span><br><span class="line">  regcomp(&amp;reg,pattern,flag);</span><br><span class="line">  <span class="comment">//执行正则表达式和缓存的比较</span></span><br><span class="line">  status=regexec(&amp;reg,buf,nmatch,pmatch,<span class="number">0</span>);</span><br><span class="line">  <span class="comment">//打印匹配的字符串</span></span><br><span class="line">  <span class="keyword">for</span>(i=pmatch[<span class="number">0</span>].rm_so;i&lt;pmatch[<span class="number">0</span>].rm_eo;++i)&#123;</span><br><span class="line">    <span class="built_in">putchar</span>(buf[i]);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">  regfree(&amp;reg);</span><br><span class="line">  <span class="keyword">return</span> status;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">  <span class="keyword">char</span> pattern[<span class="number">1024</span>]=<span class="string">&quot;^[1-9][0-9]&#123;10&#125;$&quot;</span>;</span><br><span class="line">  <span class="keyword">char</span> buf[<span class="number">1024</span>]=<span class="string">&quot;41509030127&quot;</span>;</span><br><span class="line">  <span class="keyword">int</span> status=my_match(pattern,buf);</span><br><span class="line">  <span class="keyword">if</span>(status==REG_NOMATCH)</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;No match!\n&quot;</span>);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span>(<span class="number">0</span> == status)&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;match！\n&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="C-语言中正则表达式的封装"><a href="#C-语言中正则表达式的封装" class="headerlink" title="C 语言中正则表达式的封装"></a>C 语言中正则表达式的封装</h2><p>在 C 语言中，可以对正则表达式相关的库函数进行封装，以实现方便的个人自定义接口。</p>
+<p>封装的头文件定义了相关的结构体与宏：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> start;</span><br><span class="line">    <span class="keyword">int</span> end;</span><br><span class="line">&#125; T_ReReg;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FILL_REG(buf, size, string, reg) do &#123; \</span></span><br><span class="line"><span class="meta">    <span class="meta-keyword">if</span> (VALID_REG(reg)) &#123; \</span></span><br><span class="line"><span class="meta">        snprintf(buf, size, <span class="meta-string">&quot;%*.*s&quot;</span>, LEN_REG(reg), LEN_REG(reg), &amp;string[reg.start]);&#125; \</span></span><br><span class="line"><span class="meta">    <span class="meta-keyword">else</span> &#123; \</span></span><br><span class="line"><span class="meta">        snprintf(buf, size, <span class="meta-string">&quot;&quot;</span>);&#125; \</span></span><br><span class="line"><span class="meta">&#125; while(0)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LEN_REG(reg) (reg.end - reg.start)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> VALID_REG(reg) (reg.start &gt;= 0 &amp;&amp; reg.end &gt;= reg.start)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> re_free(p) free(p)</span></span><br></pre></td></tr></table></figure>
+
+<p>封装的函数定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">re_free_registers</span><span class="params">(struct re_pattern_buffer *buffer, struct re_registers *regs)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( <span class="literal">NULL</span> != buffer &amp;&amp; REGS_REALLOCATE == buffer-&gt;regs_allocated)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="literal">NULL</span> != regs)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="literal">NULL</span> != regs-&gt;start)</span><br><span class="line">            &#123;</span><br><span class="line">                re_free(regs-&gt;start);</span><br><span class="line">                regs-&gt;start = <span class="literal">NULL</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (<span class="literal">NULL</span> != regs-&gt;end)</span><br><span class="line">            &#123;</span><br><span class="line">                re_free(regs-&gt;end);</span><br><span class="line">                regs-&gt;end = <span class="literal">NULL</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        buffer-&gt;regs_allocated = REGS_UNALLOCATED;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 通常以数组的形式定义一组T_ReReg结构，因为往往正则表达式中还包含子正则表达式，即存在分组</span></span><br><span class="line"><span class="comment">   数组0单元存放主正则表达式的位置</span></span><br><span class="line"><span class="comment">   数组1、2、3...依次存放子正则表达式的位置 */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">cp_reMatch</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pattern, <span class="keyword">const</span> <span class="keyword">char</span> *<span class="built_in">string</span>, T_ReReg *reRegs, <span class="keyword">unsigned</span> <span class="keyword">int</span> *regNum)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">re_pattern_buffer</span> <span class="title">regex</span>;</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *err = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">int</span> num = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    re_set_syntax(RE_SYNTAX_POSIX_EGREP);</span><br><span class="line">    <span class="built_in">memset</span>(&amp;regex, <span class="number">0</span>, <span class="keyword">sizeof</span>(regex));</span><br><span class="line">    err = re_compile_pattern(pattern, <span class="built_in">strlen</span>(pattern), &amp;regex);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == err)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">re_registers</span> <span class="title">regs</span>;</span></span><br><span class="line">        <span class="built_in">memset</span>(&amp;regs, <span class="number">0</span>, <span class="keyword">sizeof</span>(regs));</span><br><span class="line">        re_set_registers(&amp;regex, &amp;regs, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">        num = re_match(&amp;regex, <span class="built_in">string</span>, <span class="built_in">strlen</span>(<span class="built_in">string</span>), <span class="number">0</span>, &amp;regs);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* fill regular expression registers */</span></span><br><span class="line">        <span class="keyword">if</span> ((<span class="literal">NULL</span> != reRegs) &amp;&amp; (<span class="literal">NULL</span> != regNum) &amp;&amp; ((*regNum) &gt; <span class="number">0</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">unsigned</span> <span class="keyword">int</span> i;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="number">0</span>; (i &lt; regs.num_regs) &amp;&amp; (i &lt; *regNum); i++)</span><br><span class="line">            &#123;</span><br><span class="line">                reRegs[i].start = regs.start[i];</span><br><span class="line">                reRegs[i].end = regs.end[i];</span><br><span class="line">            &#125;</span><br><span class="line">            *regNum = i;</span><br><span class="line">        &#125;</span><br><span class="line">        re_free_registers(&amp;regex, &amp;regs);</span><br><span class="line">        regfree(&amp;regex);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/"># 技术工具</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/05/21/%E7%AE%80%E6%98%93%E7%9A%84http%E6%9C%8D%E5%8A%A1%E7%AB%AF%EF%BC%88C%E8%AF%AD%E8%A8%80%E5%AE%9E%E7%8E%B0%EF%BC%89/">简易的 http 服务端（C 语言实现）</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>vim 的基本配置 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">vim 的基本配置</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 21, 2021&nbsp;&nbsp;17:38:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="Vim-的基本配置"><a href="#Vim-的基本配置" class="headerlink" title="Vim 的基本配置"></a>Vim 的基本配置</h2><p>Vim 的默认配置不适合生产环境中的正常使用需求，因此需对 <code>.vimrc</code> 的配置文件进行配置设置。以下总结了一些 Vim 常用的配置方式。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;设置编码&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">fileencodings</span>=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">termencoding</span>=utf-8</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">encoding</span>=utf-8</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示行号&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> nu</span><br><span class="line"><span class="builtin-name">set</span> number</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;突出显示当前行&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> cursorline</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;启用鼠标&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">mouse</span>=a</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">selection</span>=exclusive</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">selectmode</span>=mouse,key</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示括号匹配&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> showmatch</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置Tab长度为4空格&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">tabstop</span>=4</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置自动缩进长度为4空格&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">shiftwidth</span>=4</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;继承前一行的缩进方式，适用于多行注释&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> autoindent</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置粘贴模式&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> paste</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示空格和tab键&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">listchars</span>=tab:&gt;-,trail:-</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;总是显示状态栏&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">laststatus</span>=2</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示光标当前位置&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> ruler</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;不要使用vi的键盘模式，而是vim自己的&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> nocompatible</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;侦测文件类型&#x27;</span></span><br><span class="line">filetype on</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;语法高亮&#x27;</span></span><br><span class="line">syntax <span class="builtin-name">enable</span></span><br><span class="line">syntax on</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;使回格键（backspace）正常处理&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">backspace</span>=2</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置制表符&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">tabstop</span>=4</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/"># 技术工具</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/21/%E3%80%901%E3%80%91rsync%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E4%B8%8E%E7%94%A8%E6%B3%95/">【转载】rsync简介：基本命令与用法</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/21/%E3%80%902%E3%80%91inotify+rsync/">【转载】rsync简介：inotify + rsync</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

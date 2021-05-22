@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>【转载】rsync简介：inotify + rsync | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【转载】rsync简介：inotify + rsync</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 21, 2021&nbsp;&nbsp;17:38:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/f-ck-need-u/p/7220193.html#auto_id_0">https://www.cnblogs.com/f-ck-need-u/p/7220193.html#auto_id_0</a></p>
+</blockquote>
+<h1 id="inotify-rsync"><a href="#inotify-rsync" class="headerlink" title="inotify+rsync"></a>inotify+rsync</h1><p>如果要实现定时同步数据，可以在客户端将 rsync 加入定时任务，但是定时任务的同步时间粒度并不能达到实时同步的要求。在 Linux kernel 2.6.13 后提供了 inotify 文件系统监控机制。通过 rsync+inotify 组合可以实现实时同步。</p>
+<p>inotify 实现工具有几款：inotify 本身、sersync、lsyncd。其中 sersync 是金山的周洋开发的工具，克服了 inotify 的缺陷，且提供了几个插件作为可选工具。此处先介绍 inotify 的用法以及它的缺陷，通过其缺陷引出 sersync，并介绍其用法。</p>
+<h2 id="安装-inotify-tools"><a href="#安装-inotify-tools" class="headerlink" title="安装 inotify-tools"></a>安装 inotify-tools</h2><p>inotify 由 inotify-tools 包提供。在安装 inotify-tools 之前，请确保内核版本高于 2.6.13，且在/proc/sys/fs/inotify 目录下有以下三项，这表示系统支持 inotify 监控，关于这 3 项的意义，下文会简单解释。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@node1 tmp]# ll /proc/sys/fs/inotify/</span><br><span class="line">total 0</span><br><span class="line">-rw-r--r-- 1 root root 0 Feb 11 19:57 max_queued_events</span><br><span class="line">-rw-r--r-- 1 root root 0 Feb 11 19:57 max_user_instances</span><br><span class="line">-rw-r--r-- 1 root root 0 Feb 11 19:57 max_user_watches</span><br></pre></td></tr></table></figure>
+
+<p>epel 源上提供了 inotify-tools 工具，或者下载源码包格式进行编译。</p>
+<p>inotify-tools 源码包地址：<a target="_blank" rel="noopener" href="https://cloud.github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz">https://cloud.github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz</a></p>
+<p>以下为编译安装过程：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tar xf inotify-tools-3.14.tar.gz</span><br><span class="line">./configure --prefix=/usr/local/inotify-tools-3.14</span><br><span class="line">make &amp;&amp; make install</span><br><span class="line">ln -s /usr/local/inotify-tools-3.14 /usr/local/inotify</span><br></pre></td></tr></table></figure>
+
+<p>inotify-tools 工具只提供了两个命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rpm -ql inotify-tools | grep bin/</span><br><span class="line">/usr/bin/inotifywait</span><br><span class="line">/usr/bin/inotifywatch</span><br></pre></td></tr></table></figure>
+
+<p>其中 inotifywait 命令用于等待文件发生变化，所以可以可以实现监控(watch)的功能，该命令是 inotify 的核心命令。inotifywatch 用于收集文件系统的统计数据，例如发生了多少次 inotify 事件，某文件被访问了多少次等等，一般用不上。</p>
+<p>以下是 inotify 相关的内核参数。</p>
+<p>(1)./proc/sys/fs/inotify/max_queued_events：调用 inotify_init 时分配到 inotify instance 中可排队的 event 数的最大值，超出值时的事件被丢弃，但会触发队列溢出 Q_OVERFLOW 事件。</p>
+<p>(2)./proc/sys/fs/inotify/max_user_instances：每一个 real user 可创建的 inotify instances 数量的上限。</p>
+<p>(3)./proc/sys/fs/inotify/max_user_watches：每个 inotify 实例相关联的 watches 的上限，即每个 inotify 实例可监控的最大目录、文件数量。如果监控的文件数目巨大，需要根据情况适当增加此值。</p>
+<h1 id="inotifywait-命令以及事件分析"><a href="#inotifywait-命令以及事件分析" class="headerlink" title="inotifywait 命令以及事件分析"></a>inotifywait 命令以及事件分析</h1><p>inotifywait 命令的选项：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-m：表示始终监控，否则应该是监控到了一次就退出监控了</span><br><span class="line">-r：递归监控，监控目录中的任何文件，包括子目录。递归监控可能会超出max_user_watches的值，需要适当调整该值</span><br><span class="line">@&lt;file&gt;：如果是对目录进行递归监控，则该选项用于排除递归目录中不被监控的文件。file是相对路径还是绝对路径由监控目录是相对还是绝对来决定</span><br><span class="line">-q：--quiet的意思，静默监控，这样就不会输出一些无关的信息</span><br><span class="line">-e：指定监控的事件。一般监控的就delete、create、attrib、modify、close_write</span><br><span class="line">--exclude &lt;pattern&gt; ：通过模式匹配来指定不被监控的文件，区分大小写</span><br><span class="line">--excludei &lt;pattern&gt;：通过模式匹配来指定不被监控的文件，不区分大小写</span><br><span class="line">--timefmt：监控到事件触发后，输出的时间格式，可指定可不指定该选项，一般设置为[--timefmt &#x27;%Y/%m/%d %H:%M:%S&#x27;]</span><br><span class="line">--format：用户自定义的输出格式，如[--format &#x27;%w%f %e%T&#x27;]</span><br><span class="line"><span class="meta">  %</span><span class="bash">w：产生事件的监控路径，不一定就是发生事件的具体文件，例如递归监控一个目录，该目录下的某文件产生事件，将输出该目录而非其内具体的文件</span></span><br><span class="line"><span class="meta">  %</span><span class="bash">f：如果监控的是一个目录，则输出产生事件的具体文件名。其他所有情况都输出空字符串</span></span><br><span class="line"><span class="meta">  %</span><span class="bash">e：产生的事件名称</span></span><br><span class="line"><span class="meta">  %</span><span class="bash">T：以<span class="string">&quot;--timefmt&quot;</span>定义的时间格式输出当前时间，要求同时定义<span class="string">&quot;--timefmt&quot;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>inotifywait -e 可监控的事件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">access：文件被访问</span><br><span class="line">modify：文件被写入</span><br><span class="line">attrib：元数据被修改。包括权限、时间戳、扩展属性等等</span><br><span class="line">close_write：打开的文件被关闭，是为了写文件而打开文件，之后被关闭的事件</span><br><span class="line">close_nowrite：read only模式下文件被关闭，即只能是为了读取而打开文件，读取结束后关闭文件的事件</span><br><span class="line">close：是close_write和close_nowrite的结合，无论是何种方式打开文件，只要关闭都属于该事件</span><br><span class="line">open：文件被打开</span><br><span class="line">moved_to：向监控目录下移入了文件或目录，也可以是监控目录内部的移动</span><br><span class="line">moved_from：将监控目录下文件或目录移动到其他地方，也可以是在监控目录内部的移动</span><br><span class="line">move：是moved_to和moved_from的结合</span><br><span class="line">moved_self：被监控的文件或目录发生了移动，移动结束后将不再监控此文件或目录</span><br><span class="line">create：在被监控的目录中创建了文件或目录</span><br><span class="line">delete：删除了被监控目录中的某文件或目录</span><br><span class="line">delete_self：被监控的文件或目录被删除，删除之后不再监控此文件或目录</span><br><span class="line">umount：挂载在被监控目录上的文件系统被umount，umount后不再监控此目录</span><br><span class="line">isdir ：监控目录相关操作</span><br></pre></td></tr></table></figure>
+
+<p>以下是几个示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# mkdir /longshuai</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# inotifywait -m /longshuai   # 以前台方式监控目录，由于没指定监控的事件，所以监控所有事件</span><br><span class="line">Setting up watches.</span><br><span class="line">Watches established.</span><br></pre></td></tr></table></figure>
+
+<p>打开其他会话，对被监控目录进行一些操作，查看各操作会触发什么事件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# cd  /longshuai    # 进入目录不触发任何事件</span><br></pre></td></tr></table></figure>
+
+<p><strong>(1).向目录中创建文件，触发 create、open attrib、close_write 和 close 事件。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# touch a.log</span><br><span class="line"></span><br><span class="line">/longshuai/ CREATE a.log</span><br><span class="line">/longshuai/ OPEN a.log</span><br><span class="line">/longshuai/ ATTRIB a.log</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE a.log</span><br></pre></td></tr></table></figure>
+
+<p>如果是创建目录，则触发的事件则少的多。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# mkdir b</span><br><span class="line"></span><br><span class="line">/longshuai/ CREATE,ISDIR b</span><br></pre></td></tr></table></figure>
+
+<p>ISDIR 表示产生该事件的对象是一个目录。</p>
+<p><strong>(2).修改文件属性，触发 attrib 事件。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# chown 666 a.log</span><br><span class="line"></span><br><span class="line">/longshuai/ ATTRIB a.log</span><br></pre></td></tr></table></figure>
+
+<p><strong>(3).cat 查看文件，触发 open、access、close_nowrite 和 close 事件。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# cat a.log</span><br><span class="line"></span><br><span class="line">/longshuai/ OPEN a.log</span><br><span class="line">/longshuai/ ACCESS a.log</span><br><span class="line">/longshuai/ CLOSE_NOWRITE,CLOSE a.log</span><br></pre></td></tr></table></figure>
+
+<p><strong>(4).向文件中追加或写入或清除数据，触发 open、modify、close_write 和 close 事件。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# echo &quot;haha&quot; &gt;&gt; a.log</span><br><span class="line"></span><br><span class="line">/longshuai/ OPEN a.log</span><br><span class="line">/longshuai/ MODIFY a.log</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE a.log</span><br></pre></td></tr></table></figure>
+
+<p><strong>(5).vim 打开文件并修改文件，中间涉及到临时文件，所以有非常多的事件。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# vim a.log</span><br><span class="line"></span><br><span class="line">/longshuai/ OPEN,ISDIR</span><br><span class="line">/longshuai/ CLOSE_NOWRITE,CLOSE,ISDIR</span><br><span class="line">/longshuai/ OPEN,ISDIR</span><br><span class="line">/longshuai/ CLOSE_NOWRITE,CLOSE,ISDIR</span><br><span class="line">/longshuai/ OPEN a.log</span><br><span class="line">/longshuai/ CREATE .a.log.swp</span><br><span class="line">/longshuai/ OPEN .a.log.swp</span><br><span class="line">/longshuai/ CREATE .a.log.swx</span><br><span class="line">/longshuai/ OPEN .a.log.swx</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE .a.log.swx</span><br><span class="line">/longshuai/ DELETE .a.log.swx</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE .a.log.swp</span><br><span class="line">/longshuai/ DELETE .a.log.swp</span><br><span class="line">/longshuai/ CREATE .a.log.swp</span><br><span class="line">/longshuai/ OPEN .a.log.swp</span><br><span class="line">/longshuai/ MODIFY .a.log.swp</span><br><span class="line">/longshuai/ ATTRIB .a.log.swp</span><br><span class="line">/longshuai/ CLOSE_NOWRITE,CLOSE a.log</span><br><span class="line">/longshuai/ OPEN a.log</span><br><span class="line">/longshuai/ CLOSE_NOWRITE,CLOSE a.log</span><br><span class="line">/longshuai/ MODIFY .a.log.swp</span><br><span class="line">/longshuai/ CREATE 4913</span><br><span class="line">/longshuai/ OPEN 4913</span><br><span class="line">/longshuai/ ATTRIB 4913</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE 4913</span><br><span class="line">/longshuai/ DELETE 4913</span><br><span class="line">/longshuai/ MOVED_FROM a.log</span><br><span class="line">/longshuai/ MOVED_TO a.log~</span><br><span class="line">/longshuai/ CREATE a.log</span><br><span class="line">/longshuai/ OPEN a.log</span><br><span class="line">/longshuai/ MODIFY a.log</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE a.log</span><br><span class="line">/longshuai/ ATTRIB a.log</span><br><span class="line">/longshuai/ ATTRIB a.log</span><br><span class="line">/longshuai/ MODIFY .a.log.swp</span><br><span class="line">/longshuai/ DELETE a.log~</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE .a.log.swp</span><br><span class="line">/longshuai/ DELETE .a.log.swp</span><br></pre></td></tr></table></figure>
+
+<p>其中有”ISDIR”标识的是目录事件。此外，需要注意到 vim 过程中，相应的几个临时文件(.swp、.swx 和以~为后缀的备份文件)也产生了事件，这些临时文件的相关事件在实际应用过程中，其实不应该被监控。</p>
+<p><strong>(6).向目录中拷入一个文件，触发 create、open、modify 和 close_write、close 事件。其实和新建文件基本类似。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# cp /bin/find .</span><br><span class="line"></span><br><span class="line">/longshuai/ CREATE find</span><br><span class="line">/longshuai/ OPEN find</span><br><span class="line">/longshuai/ MODIFY find</span><br><span class="line">/longshuai/ MODIFY find</span><br><span class="line">/longshuai/ CLOSE_WRITE,CLOSE find</span><br></pre></td></tr></table></figure>
+
+<p><strong>(7).向目录中移入和移除一个文件。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# mv /tmp/after.log /longshuai</span><br><span class="line"></span><br><span class="line">/longshuai/ MOVED_TO after.log</span><br><span class="line"></span><br><span class="line">[root@xuexi longshuai]# mv /longshuai/after.log /tmp</span><br><span class="line"></span><br><span class="line">/longshuai/ MOVED_FROM after.log</span><br></pre></td></tr></table></figure>
+
+<p><strong>(8).删除一个文件，触发 delete 事件。</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi longshuai]# rm -f a.log</span><br><span class="line"></span><br><span class="line">/longshuai/ DELETE a.log</span><br></pre></td></tr></table></figure>
+
+<p>从上面的测试结果中可以发现，很多动作都涉及了 close 事件，且大多数情况都是伴随着 close_write 事件的。所以，大多数情况下在定义监控事件时，其实并不真的需要监控 open、modify、close 事件。特别是 close，只需监控它的分支事件 close_write 和 close_nowrite 即可。由于一般情况下 inotify 都是为了监控文件的增删改，不会监控它的访问，所以一般只需监控 close_write 即可。</p>
+<p>由于很多时候定义触发事件后的操作都是根据文件来判断的，例如 a 文件被监控到了变化(不管是什么变化)，就立即执行操作 A，又由于对文件的一个操作行为往往会触发多个事件，例如 cat 查看文件就触发了 open、access、close_nowrite 和 close 事件，这样很可能会因为多个事件被触发而重复执行操作 A。例如下面的示例，当监控到了/var/log/messages 文件中出现了 a.log 关键字，就执行 echo 动作。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">while inotifywait -mrq -e modify /var/log/messages; do</span><br><span class="line">  if tail -n1 /var/log/messages | grep a.log; then</span><br><span class="line">    echo &quot;haha&quot;</span><br><span class="line">  fi</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<p>综合以上考虑，建议对监控对象的 close_write、moved_to、moved_from、delete 和 isdir(主要是 create,isdir，但无法定义这两个事件的整体，所以仅监控 isdir)事件定义对应的操作，因为它们互不重复。如有需要，可以将它们分开定义，再添加需要监控的其他事件。例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi tmp]# cat a.sh</span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash">inotifywait -mrq -e delete,close_write,moved_to,moved_from,isdir /longshuai |\</span></span><br><span class="line"><span class="bash"><span class="keyword">while</span> <span class="built_in">read</span> line;<span class="keyword">do</span></span></span><br><span class="line">   if echo $line | grep -i delete &amp;&gt;/dev/null; then</span><br><span class="line">       echo &quot;At `date +&quot;%F %T&quot;`: $line&quot; &gt;&gt;/etc/delete.log</span><br><span class="line">   else</span><br><span class="line">       rsync -az $line --password-file=/etc/rsync_back.passwd rsync://rsync_backup@172.16.10.6::longshuai</span><br><span class="line">   fi</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<h1 id="inotify-应该装在哪里"><a href="#inotify-应该装在哪里" class="headerlink" title="inotify 应该装在哪里"></a>inotify 应该装在哪里</h1><p>inotify 是监控工具，监控目录或文件的变化，然后触发一系列的操作。</p>
+<p>假如有一台站点发布服务器 A，还有 3 台 web 服务器 B/C/D，目的是让服务器 A 上存放站点的目录中有文件变化时，自动触发同步将它们推到 web 服务器上，这样能够让 web 服务器最快的获取到最新的文件。需要搞清楚的是，监控的是 A 上的目录，推送到的是 B/C/D 服务器，所以在站点发布服务器 A 上装好 inotify 工具。除此之外，一般还在 web 服务器 BCD 上将 rsync 配置为 daemon 运行模式，让其在 873 端口上处于监听状态(并非必须，即使是 sersync 也非必须如此)。也就是说，对于 rsync 来说，监控端是 rsync 的客户端，其他的是 rsync 的服务端。</p>
+<p>当然，这只是最可能的使用情况，并非一定需要如此。况且，inotify 是独立的工具，它和 rsync 无关，它只是为 rsync 提供一种比较好的实时同步方式而已。</p>
+<h1 id="inotify-rsync-示例脚本-不完善"><a href="#inotify-rsync-示例脚本-不完善" class="headerlink" title="inotify+rsync 示例脚本(不完善)"></a>inotify+rsync 示例脚本(不完善)</h1><p>以下是监控/www 目录的一个 inotify+rsync 脚本示例，也是网上流传的用法版本。但注意，该脚本非常烂，实际使用时需要做一些修改，此处仅仅只是示例(如果你不考虑资源消耗，那就无所谓)。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# cat ~/inotify.sh</span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"> </span><br><span class="line">watch_dir=/www</span><br><span class="line">push_to=172.16.10.5</span><br><span class="line">inotifywait -mrq -e delete,close_write,moved_to,moved_from,isdir --timefmt &#x27;%Y-%m-%d %H:%M:%S&#x27; --format &#x27;%w%f:%e:%T&#x27; $watch_dir \</span><br><span class="line">--exclude=&quot;.*.swp&quot; |\</span><br><span class="line">while read line;do</span><br><span class="line"><span class="meta">  #</span><span class="bash"> logging some files <span class="built_in">which</span> has been deleted and moved out</span></span><br><span class="line">    if echo $line | grep -i -E &quot;delete|moved_from&quot; &amp;&gt;/dev/null;then</span><br><span class="line">        echo &quot;$line&quot; &gt;&gt; /etc/inotify_away.log</span><br><span class="line">    fi</span><br><span class="line"><span class="meta">  #</span><span class="bash"> from here, start rsync<span class="string">&#x27;s function</span></span></span><br><span class="line">    rsync -az --delete --exclude=&quot;*.swp&quot; --exclude=&quot;*.swx&quot; $watch_dir $push_to:/tmp</span><br><span class="line">    if [ $? -eq 0 ];then</span><br><span class="line">        echo &quot;sent $watch_dir success&quot;</span><br><span class="line">    else</span><br><span class="line">        echo &quot;sent $watch_dir failed&quot;</span><br><span class="line">    fi</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<p>然后对上面的脚本赋予执行权限并执行。注意，该脚本是用来前台测试运行的，如果要后台运行，则将最后一段的 if 字句删掉。</p>
+<p>该脚本记录了哪些被删除或从监控目录中移出的文件，且监控到事件后，触发的 rsync 操作是对整个监控目录 $watch_dir 进行同步，并且不对 vim 产生的临时文件进行同步。</p>
+<p>前台运行该监控脚本。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# ~/inotify.sh</span><br></pre></td></tr></table></figure>
+
+<p>然后测试分别向监控目录/www 下做拷贝文件、删除文件等操作。</p>
+<p>例如删除文件，会先记录删除事件到/etc/inotify_away.log 文件中，再执行 rsync 同步删除远端对应的文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/www/yum.repos.d/base.repo:DELETE:2017-07-21 14:47:46</span><br><span class="line">sent /www success</span><br><span class="line">/www/yum.repos.d:DELETE,ISDIR:2017-07-21 14:47:46</span><br><span class="line">sent /www success</span><br></pre></td></tr></table></figure>
+
+<p>再例如，拷入目录/etc/pki 到/www 下，会产生多个 rsync 结果。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sent /www success</span><br><span class="line">sent /www success</span><br><span class="line">sent /www success</span><br><span class="line">sent /www success</span><br><span class="line">sent /www success</span><br><span class="line">sent /www success</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+
+<p>显然，由于拷入了多个文件，rsync 被触发了多次，但其实 rsync 只要同步一次/www 目录到远端就足够了，多余的 rsync 操作完全是浪费资源。如果拷入少量文件，其实无所谓，但如果拷入成千上万个文件，将长时间调用 rsync。例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# cp -a /usr/share/man /www</span><br></pre></td></tr></table></figure>
+
+<p>拷入了 15000 多个文件到 www 目录下，该脚本将循环 15000 多次，且将调用 15000 多次 rsync。虽然经过一次目录同步之后，rsync 的性能消耗非常低(即使性能浪费少，但仍然是浪费)，但它消耗大量时间时间资源以及网络带宽。</p>
+<h1 id="inotify-的不足之处"><a href="#inotify-的不足之处" class="headerlink" title="inotify 的不足之处"></a>inotify 的不足之处</h1><p>虽然 inotify 已经整合到了内核中，在应用层面上也常拿来辅助 rsync 实现实时同步功能，但是 inotify 因其设计太过细致从而使得它配合 rsync 并不完美，所以需要尽可能地改进 inotify+rsync 脚本或者使用 sersync 工具。另外，inotify 存在 bug。</p>
+<h2 id="inotify-的-bug"><a href="#inotify-的-bug" class="headerlink" title="inotify 的 bug"></a>inotify 的 bug</h2><p>当向监控目录下拷贝复杂层次目录(多层次目录中包含文件)，或者向其中拷贝大量文件时，inotify 经常会随机性地遗漏某些文件。这些遗漏掉的文件由于未被监控到，所有监控的后续操作都不会执行，例如不会被 rsync 同步。</p>
+<p>实际上，上面描述的问题不是 inotify 的缺陷，而是 inotify-tools 包中 inotifywait 工具的缺陷。inotifywait 的 man 文档中也给出了这个 bug 说明。</p>
+<blockquote>
+<p>BUGS<br>There are race conditions in the recursive directory watching code which can cause events to be missed if they occur in a directory immediately after that directory is created.  This is probably not fixable.</p>
+</blockquote>
+<p>也就是说，那些直接发起 inotify 相关系统调用的上层工具(如 sersync、lsyncd 等)可能不会出现这个 bug。</p>
+<p>为了说明这个 bug 的影响，以下给出一些示例来证明。</p>
+<p>以下是一个监控 delete 和 close_write 事件的示例，监控的是/www 目录，该目录下初始时没有 pki 目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# inotifywait -mrq -e delete,close_write --format &#x27;%w%f:%e&#x27; /www</span><br></pre></td></tr></table></figure>
+
+<p>监控开始后，准备向该目录下拷贝/etc/pki 目录，该目录有多个子目录，且有多个层次的子目录，有一些文件分布在各个子目录下。经过汇总，/etc/pki 目录下共有 30 个普通文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# find /etc/pki/ -type f | wc -l</span><br><span class="line">30</span><br></pre></td></tr></table></figure>
+
+<p>另开一个终端，拷贝 pki 目录到/www 下。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# cp -a /etc/pki /www</span><br></pre></td></tr></table></figure>
+
+<p>于此同时，在监控终端上将产生一些监控事件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">/www/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Debug-7:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Testing-7:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/tls/certs/Makefile:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/tls/certs/make-dummy-cert:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/tls/certs/renew-dummy-cert:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/tls/misc/c_info:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/tls/misc/c_issuer:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/tls/misc/c_name:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/tls/openssl.cnf:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/README:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/ca-legacy.conf:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/extracted/java/README:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/extracted/java/cacerts:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/extracted/pem/tls-ca-bundle.pem:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/extracted/pem/email-ca-bundle.pem:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/extracted/pem/objsign-ca-bundle.pem:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/ca-trust/source/README:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/nssdb/cert8.db:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/nssdb/cert9.db:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/nssdb/key3.db:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/nssdb/key4.db:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/nssdb/pkcs11.txt:CLOSE_WRITE,CLOSE</span><br><span class="line">/www/pki/nssdb/secmod.db:CLOSE_WRITE,CLOSE</span><br></pre></td></tr></table></figure>
+
+<p>数一数上面监控到的事件结果，总共有 25 行，也就是 25 个文件的拷贝动作被监控到，但实际上拷贝的总文件数(目录和链接文件不纳入计算)却是 30 个。换句话说，inotify 遗漏了 5 个文件。</p>
+<p>经过测试，遗漏的数量和文件不是固定而是随机的(所以运气好可能不会有遗漏)，且只有 close_write 事件会被遗漏，delete 是没有问题的。为了证实这个 bug，再举两个示例。</p>
+<p>向监控目录/www 下拷贝/usr/share/man 目录，该目录下有 15441 个普通文件，且最深有 3 层子目录，层次上并不算复杂。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# find /usr/share/man/ -type f | wc -l</span><br><span class="line">15441</span><br></pre></td></tr></table></figure>
+
+<p>为了方便计算监控到的事件数量，将事件结果重定向到文件 man.log 中去。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# inotifywait -mrq -e delete,close_write,moved_to,moved_from,isdir --format &#x27;%w%f:%e&#x27; /www &gt; /tmp/man.log</span><br></pre></td></tr></table></figure>
+
+<p>开始拷贝。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# cp -a /usr/share/man /www</span><br></pre></td></tr></table></figure>
+
+<p>拷贝结束后，统计/tmp/man.log 文件中的行数，也即监控到的事件数。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# cat /tmp/man.log | wc -l</span><br><span class="line">15388</span><br></pre></td></tr></table></figure>
+
+<p>显然，监控到了 15388 个文件，比实际拷入的文件少了 53 个，这也证明了 inotify 的 bug。</p>
+<p>但上述两个示例监控的都是 close_write 事件，为了保证证明的严格性，监控所有事件，为了方便后续的统计，将监控结果重定向到 pki.log 文件中，且在监控开始之前，先删除/www/pki 目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# rm -rf /www/pki</span><br><span class="line"></span><br><span class="line">[root@xuexi ~]# inotifywait -mrq --format &#x27;%w%f:%e&#x27; /www &gt; /tmp/pki.log</span><br></pre></td></tr></table></figure>
+
+<p>向监控目录/www 下拷贝/etc/pki 目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi ~]# cp -a /etc/pki /www</span><br></pre></td></tr></table></figure>
+
+<p>由于监控了所有事件，所以目录相关事件”ISDIR”以及软链接相关事件也都被重定向到/tmp/pki.log 中，为了统计监控到的文件数量，先把 pki.log 中目录相关的”ISDIR”行去掉，再对同一个文件进行去重，以便一个文件的多个事件只被统计一次，以下是统计命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# sed /ISDIR/d /tmp/pki.log | cut -d&quot;:&quot; -f1 | sort -u | wc -l</span><br><span class="line">32</span><br></pre></td></tr></table></figure>
+
+<p>结果竟然比普通文件数 30 多 2 个，实际并非如此，因为 pki.log 中软链接文件也被统计了，但/www/pki 目录下普通文件加上软链接文件总共有 35 个文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# find /www/pki -type f -o -type l | wc -l</span><br><span class="line">35</span><br></pre></td></tr></table></figure>
+
+<p>也就是说，即使监控的是全部事件，也还是出现了遗漏，所以我认为这是 inotify 的一个 bug。</p>
+<p>但是需要说明的是，只有拷贝多层次包括多文件的目录时才会出现此 bug，拷贝单个文件或简单无子目录的目录时不会出现此 bug。对于 inotify+rsync 来说，由于触发事件后常使用 rsync 同步整个目录而非单个文件，所以这个 bug 对 rsync 来说并不算严重。</p>
+<h2 id="inotify-rsync-的缺陷"><a href="#inotify-rsync-的缺陷" class="headerlink" title="inotify+rsync 的缺陷"></a>inotify+rsync 的缺陷</h2><p>由于 inotify 的 bug，使用 inotify+rsync 时应该总是让 rsync 同步目录，而不是同步那些产生事件的单个文件，否则很可能会出现文件遗漏。另一方面，同步单个文件的性能非常差。下面相关缺陷的说明将默认 rsync 同步的是目录。</p>
+<p>使用 inotify+rsync 时，考虑两方面问题：(1).由于 inotify 监控经常会对一个文件产生多个事件，且一次性操作同一个目录下多个文件也会产生多个事件，这使得 inotify 几乎总是多次触发 rsync 同步目录，由于 rsync 同步的是目录，所以多次触发 rsync 完全没必要，这会浪费资源和网络带宽；如果是分层次独立监控子目录，则会导致同步无法保证实时性(2).vim 编辑文件的过程中会产生.swp 和.swx 等临时文件，inotify 也会监控这些临时文件，且临时文件会涉及多个事件，因此它们可能也会被 rsync 拷贝走，除非设置好排除临时文件，但无论如何，这些临时文件是不应该被同步的，极端情况下，同步 vim 的临时文件到服务器上可能是致命的。</p>
+<p>由于这两个缺陷，使得通过脚本实现的 inotify+rsync 几乎很难达到完美，即使要达到不错的完美度，也不是件容易的事(不要天真的认为网上那些 inotify+rsync 示例或者培训视频里老师给出的示例就是完美的，那些东西只能算是正确的囫囵吞枣式的用法示例)。总之，为了让 inotify+rsync 即能保证同步性能，又能保证不同步临时文件，认真设计 inotify+rsync 的监控事件、循环以及 rsync 命令是很有必要的。</p>
+<p>在设计 inotify+rsync 脚本过程中，有以下几个目标应该尽量纳入考虑或达到：</p>
+<p>(1).每个文件都尽量少地产生监控事件，但又不能遗漏事件。</p>
+<p>(2).让 rsync 同步目录，而不是同步产生事件的单个文件。</p>
+<p>(3).一次性操作同步目录下的多个文件会产生多个事件，导致多次触发 rsync。如果能让这一批操作只触发一次 rsync，则会大幅降低资源的消耗。</p>
+<p>(4).rsync 同步目录时，考虑好是否要排除某些文件，是否要加上”–delete”选项等。</p>
+<p>(5).为了性能，可以考虑对子目录、对不同事件单独设计 inotify+rsync 脚本。</p>
+<p>以前文给出的示例脚本来分析。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi www]# cat ~/inotify.sh</span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"> </span><br><span class="line">watch_dir=/www</span><br><span class="line">push_to=172.16.10.5</span><br><span class="line">inotifywait -mrq -e delete,close_write,moved_to,moved_from,isdir --timefmt &#x27;%Y-%m-%d %H:%M:%S&#x27; --format &#x27;%w%f:%e:%T&#x27; $watch_dir \</span><br><span class="line">--exclude=&quot;.*.swp&quot; |\</span><br><span class="line">while read line;do</span><br><span class="line"><span class="meta">  #</span><span class="bash"> logging some files <span class="built_in">which</span> has been deleted and moved out</span></span><br><span class="line">    if echo $line | grep -i -E &quot;delete|moved_from&quot; &amp;&gt;/dev/null;then</span><br><span class="line">        echo &quot;$line&quot; &gt;&gt; /etc/inotify_away.log</span><br><span class="line">    fi</span><br><span class="line"><span class="meta">  #</span><span class="bash"> from here, start rsync<span class="string">&#x27;s function</span></span></span><br><span class="line">    rsync -az --delete --exclude=&quot;*.swp&quot; --exclude=&quot;*.swx&quot; $watch_dir $push_to:/tmp</span><br><span class="line">    if [ $? -eq 0 ];then</span><br><span class="line">        echo &quot;sent $watch_dir success&quot;</span><br><span class="line">    else</span><br><span class="line">        echo &quot;sent $watch_dir failed&quot;</span><br><span class="line">    fi</span><br><span class="line">done </span><br></pre></td></tr></table></figure>
+
+<p>该脚本中已经尽量少地设置监控事件，使得它尽量少重复触发 rsync。但需要明确的是，尽管设计的目标是尽量少触发事件，但应该以满足需求为前提来定义监控事件。如果不清楚如何选择监控事件，回看前文 inotify 命令以及事件分析。另外，可以考虑对文件、目录、子目录单独定义不同的脚本分别监控不同事件。</p>
+<p>该脚本的不足之处主要在于重复触发 rsync。该脚本中 rsync 同步的是目录而非单个文件，所以如果一次性操作了该目录中多个文件，将会产生多个事件，也因此会触发多次 rsync 命令，在前文中给出了一个拷贝/usr/share/man 的示例，它调用了 15000 多次 rsync，其实只需同步一次即可，剩余的上万次同步完全是多余的。</p>
+<p>因此，上述脚本的改进方向是尽量少地调用 rsync，但却要保证 rsync 的实时性和同步完整性。使用 sersync 工具可以很轻松地实现这一点，也许 sersync 的作者开发该工具的最初目标也是为了解决这个问题。关于 sersync 的用法，留在后文介绍。</p>
+<h1 id="inotify-rsync-的最佳实现"><a href="#inotify-rsync-的最佳实现" class="headerlink" title="inotify+rsync 的最佳实现"></a>inotify+rsync 的最佳实现</h1><p>在上面已经提过 inotify+rsync 不足之处以及改进的目标。以下是通过修改 shell 脚本来改进 inotify+rsync 的示例。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[root@xuexi tmp]# cat ~/inotify.sh</span><br><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##########################################################</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">  description: inotify+rsync best practice               <span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">  author     : 骏马金龙                                   <span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">  blog       : http://www.cnblogs.com/f-ck-need-u/       <span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">##########################################################</span></span></span><br><span class="line"> </span><br><span class="line">watch_dir=/www</span><br><span class="line">push_to=172.16.10.5</span><br><span class="line"><span class="meta"> </span></span><br><span class="line"><span class="meta">#</span><span class="bash"> First to <span class="keyword">do</span> is initial sync</span></span><br><span class="line">rsync -az --delete --exclude=&quot;*.swp&quot; --exclude=&quot;*.swx&quot; $watch_dir $push_to:/tmp</span><br><span class="line"> </span><br><span class="line">inotifywait -mrq -e delete,close_write,moved_to,moved_from,isdir --timefmt &#x27;%Y-%m-%d %H:%M:%S&#x27; --format &#x27;%w%f:%e:%T&#x27; $watch_dir \</span><br><span class="line">--exclude=&quot;.*.swp&quot; &gt;&gt;/etc/inotifywait.log &amp;</span><br><span class="line"> </span><br><span class="line">while true;do</span><br><span class="line">     if [ -s &quot;/etc/inotifywait.log&quot; ];then</span><br><span class="line">        grep -i -E &quot;delete|moved_from&quot; /etc/inotifywait.log &gt;&gt; /etc/inotify_away.log</span><br><span class="line">        rsync -az --delete --exclude=&quot;*.swp&quot; --exclude=&quot;*.swx&quot; $watch_dir $push_to:/tmp</span><br><span class="line">        if [ $? -ne 0 ];then</span><br><span class="line">           echo &quot;$watch_dir sync to $push_to failed at `date +&quot;%F %T&quot;`,please check it by manual&quot; |\</span><br><span class="line">           mail -s &quot;inotify+Rsync error has occurred&quot; root@localhost</span><br><span class="line">        fi</span><br><span class="line">        cat /dev/null &gt; /etc/inotifywait.log</span><br><span class="line">        rsync -az --delete --exclude=&quot;*.swp&quot; --exclude=&quot;*.swx&quot; $watch_dir $push_to:/tmp</span><br><span class="line">    else</span><br><span class="line">        sleep 1</span><br><span class="line">    fi</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<p>为了让一次性对目录下多个文件的操作只触发一次 rsync，通过 while read line 这种读取标准输入的循环方式是不可能实现的。</p>
+<p>本人的实现方法是将 inotifywait 得到的事件记录到文件/etc/inotifywait.log 中，然后在死循环中判断该文件，如果该文件不为空则调用一次 rsync 进行同步，同步完后立即清空 inotifywait.log 文件，防止重复调用 rsync。但需要考虑一种情况，inotifywait 可能会不断地向 inotifywait.log 中写入数据，清空该文件可能会使得在 rsync 同步过程中被 inotifywait 监控到的文件被 rsync 遗漏，所以在清空该文件后应该再调用一次 rsync 进行同步，这也变相地实现了失败重传的错误处理功能。如果没有监控到事件，inotifywait.log 将是空文件，此时循环将睡眠 1 秒钟，所以该脚本并不是百分百的实时，但 1 秒钟的误差对于 cpu 消耗来说是很值得的。</p>
+<p>该脚本对每批事件只调用两次 rsync，虽然无法像 sersync 一样只触发一次 rsync，但差距完全可以忽略不计。</p>
+<p>另外，脚本中 inotifywait 命令中的后台符号”&amp;”绝不能少，否则脚本将一直处于 inotifywait 命令阶段，不会进入到下一步的循环阶段。但需要注意，脚本中(子 shell)的后台进程在脚本结束的时候不会随之停止，而是挂靠在 pid=1 的 init/systemd 进程下，这种情况下可以直接使用 killall <strong>script_file</strong> 的方式来停止脚本，这样脚本中的后台也会中断。如果想直接在脚本中实现这样的功能，见：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/f-ck-need-u/p/8661501.html">如何让 shell 脚本自杀</a>。</p>
+<p>实际上，上面的脚本还远不算完美，更完美的做法是提供一个判断功能，如果监控的目录非常大(即文件数量非常多)，应该传输变化的单个文件而不是同步整个目录，如果监控目录不算大，可以考虑同步整个目录。sersync 采用的方式是监控目录，但取出发生变化的单个文件并同步，并提供定时任务来决定多久整体同步一次，也就是整个目录同步。这一切都能通过 shell 脚本来实现，包括它的多线程也一样，如果有兴趣，可以自己写一写。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/"># 技术工具</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/21/Vim%E7%9A%84%E5%9F%BA%E6%9C%AC%E9%85%8D%E7%BD%AE/">vim 的基本配置</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

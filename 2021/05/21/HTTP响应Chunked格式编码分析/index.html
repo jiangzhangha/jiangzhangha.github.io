@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>HTTP 响应 Chunked 格式编码分析 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">HTTP 响应 Chunked 格式编码分析</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 21, 2021&nbsp;&nbsp;21:56:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="HTTP-响应-Chunked-格式编码分析"><a href="#HTTP-响应-Chunked-格式编码分析" class="headerlink" title="HTTP 响应 Chunked 格式编码分析"></a>HTTP 响应 Chunked 格式编码分析</h2><p>在某些时候，服务端生成的 <code>HTTP</code> 应答数据是无法确定信息的大小，这个时候，使用 <code>Content-Length</code> 无法在事前写入长度，当需要实时生成消息长度，服务端一般采用 <code>Chunked</code> 格式编码。</p>
+<p>在进行 <code>Chunked</code> 格式编码时，回复的消息头部具有 <code>transfer-coding</code> 字段，并且该字段被定义为 <code>Chunked</code>，表示将采用 <code>Chunked</code> 格式编码传输数据内容。</p>
+<p><code>Chunked</code> 编码，使用若干个 <code>Chunk</code> 串组合而成，且由一个标明长度为 0 的 <code>Chunk</code> 块标识结束。</p>
+<p>每个 <code>Chunk</code> 块分为头部与正文两个部分。</p>
+<p>头部内容指定正文的字符总数，用十六进制数字表示，头部内容还指定数量单位，但是一般省略不写。</p>
+<p>正文部分就是指定长度的实际数据内容。</p>
+<p>在正文与头部之间，使用回车换行符（<code>CRLF</code>）隔开。</p>
+<p>在最后一个 <code>Chunk</code> 块，其头部定义长度为 0，该 <code>Chunk</code> 块中的内容被称为 <code>footer</code>，是一些附加的 <code>header</code> 信息，通常可以省略。</p>
+<p>一般数据结构可模拟表示为：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-attr">[chunk块长度]</span><span class="selector-attr">[CRLF]</span><span class="selector-attr">[chunk块数据]</span><span class="selector-attr">[CRLF]</span><span class="selector-attr">[chunk块长度]</span><span class="selector-attr">[CRLF]</span><span class="selector-attr">[chunk块数据]</span><span class="selector-attr">[CRLF]</span>......<span class="selector-attr">[chunk块长度]</span><span class="selector-attr">[CRLF]</span><span class="selector-attr">[chunk块数据]</span><span class="selector-attr">[CRLF]</span><span class="selector-attr">[长度0]</span><span class="selector-attr">[CRLF]</span><span class="selector-attr">[footer内容]</span><span class="selector-attr">[CRLF]</span></span><br></pre></td></tr></table></figure>
+
+<p>注意，<code>chunk</code> 块长度是以十六进制的 ASCII 码表示，比如 86AE，表示长度为 34478。一般 <code>chunk</code> 块长度占 7 个字节，不满 7 个字节以空格补齐，空格的 ASCII 码为 <code>0x20</code>。</p>
+<p>对 <code>chunked</code> 编码格式的数据进行解码，就是将分块的 <code>chunk-data</code> 数据整合恢复成一块报文体，同时记录此数据体的长度。</p>
+<p>解码流程的伪代码为：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">length=<span class="number">0</span>						<span class="comment">//长度计数器置为0</span></span><br><span class="line"><span class="keyword">read</span> chunk-<span class="keyword">size</span>, chunk-extension(<span class="keyword">if</span> <span class="keyword">any</span>) and CRLF	<span class="comment">//读取chunk-size与chunk-extension</span></span><br><span class="line"><span class="keyword">while</span>(chunk-<span class="keyword">size</span> &gt; <span class="number">0</span>)					<span class="comment">//表明不是last-chunk</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">read</span> chunk-data and CRLF			<span class="comment">//读chunk-size大小的chunk-data</span></span><br><span class="line">	<span class="keyword">append</span> chunk-data to entity-body		<span class="comment">//追加chunk-data数据至整体数据块</span></span><br><span class="line">	length = length + chunk-<span class="keyword">size</span>			<span class="comment">//计算数据长度</span></span><br><span class="line">	<span class="keyword">read</span> chunk-<span class="keyword">size</span> and CRLF			<span class="comment">//读取新的chunk-size</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">read</span> entity-header					<span class="comment">//entity-header的格式为name:value</span></span><br><span class="line">							<span class="comment">//如果为空。则只有CRLF</span></span><br><span class="line"><span class="keyword">while</span>(entity-header not empty)				<span class="comment">//非空行</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">append</span> entity-header to existing header fields</span><br><span class="line">	<span class="keyword">read</span> entity-header</span><br><span class="line">&#125;</span><br><span class="line">Content-Length = length					<span class="comment">//获取整个报文的长度值</span></span><br><span class="line">remove <span class="string">&quot;chunked&quot;</span> <span class="keyword">from</span> Transfer-Encoding			<span class="comment">//去除chunked标志</span></span><br></pre></td></tr></table></figure>
+
+<p>范例：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Encoded</span> response</span><br><span class="line"><span class="attribute">HTTP</span>/<span class="number">1</span>.<span class="number">1</span> <span class="number">200</span> OK</span><br><span class="line"><span class="attribute">Content</span>-Type: text/plain</span><br><span class="line"><span class="attribute">Transfer</span>-Encoding: chunked</span><br><span class="line"></span><br><span class="line"><span class="attribute">25</span></span><br><span class="line"><span class="attribute">This</span> is the data in the first chunk</span><br><span class="line"></span><br><span class="line"><span class="attribute">1A</span></span><br><span class="line"><span class="attribute">and</span> this is the second one</span><br><span class="line"><span class="attribute">0</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">same</span> as above, raw bytes in hex</span><br><span class="line"><span class="attribute">0000</span>-<span class="number">000</span>F   <span class="number">48</span> <span class="number">54</span> <span class="number">54</span> <span class="number">50</span> <span class="number">2</span>f <span class="number">31</span> <span class="number">2</span>e <span class="number">31</span> <span class="number">20</span> <span class="number">32</span> <span class="number">30</span> <span class="number">30</span> <span class="number">20</span> <span class="number">4</span>f <span class="number">4</span>b <span class="number">0</span>d   HTTP/<span class="number">1</span>.<span class="number">1</span> <span class="number">200</span> OK.</span><br><span class="line"><span class="attribute">0010</span>-<span class="number">001</span>F   <span class="number">0</span>a <span class="number">43</span> <span class="number">6</span>f <span class="number">6</span>e <span class="number">74</span> <span class="number">65</span> <span class="number">6</span>e <span class="number">74</span> <span class="number">2</span>d <span class="number">54</span> <span class="number">79</span> <span class="number">70</span> <span class="number">65</span> <span class="number">3</span>a <span class="number">20</span> <span class="number">74</span>   .Content-Type: t</span><br><span class="line"><span class="attribute">0020</span>-<span class="number">002</span>F   <span class="number">65</span> <span class="number">78</span> <span class="number">74</span> <span class="number">2</span>f <span class="number">70</span> <span class="number">6</span>c <span class="number">61</span> <span class="number">69</span> <span class="number">6</span>e <span class="number">0</span>d <span class="number">0</span>a <span class="number">54</span> <span class="number">72</span> <span class="number">61</span> <span class="number">6</span>e <span class="number">73</span>   ext/plain..Trans</span><br><span class="line"><span class="attribute">0030</span>-<span class="number">003</span>F   <span class="number">66</span> <span class="number">65</span> <span class="number">72</span> <span class="number">2</span>d <span class="number">45</span> <span class="number">6</span>e <span class="number">63</span> <span class="number">6</span>f <span class="number">64</span> <span class="number">69</span> <span class="number">6</span>e <span class="number">67</span> <span class="number">3</span>a <span class="number">20</span> <span class="number">63</span> <span class="number">68</span>   fer-Encoding: ch</span><br><span class="line"><span class="attribute">0040</span>-<span class="number">004</span>F   <span class="number">75</span> <span class="number">6</span>e <span class="number">6</span>b <span class="number">65</span> <span class="number">64</span> <span class="number">0</span>d <span class="number">0</span>a <span class="number">0</span>d <span class="number">0</span>a <span class="number">32</span> <span class="number">35</span> <span class="number">0</span>d <span class="number">0</span>a <span class="number">54</span> <span class="number">68</span> <span class="number">69</span>   unked....<span class="number">25</span>..Thi</span><br><span class="line"><span class="attribute">0050</span>-<span class="number">005</span>F   <span class="number">73</span> <span class="number">20</span> <span class="number">69</span> <span class="number">73</span> <span class="number">20</span> <span class="number">74</span> <span class="number">68</span> <span class="number">65</span> <span class="number">20</span> <span class="number">64</span> <span class="number">61</span> <span class="number">74</span> <span class="number">61</span> <span class="number">20</span> <span class="number">69</span> <span class="number">6</span>e   s is the data in</span><br><span class="line"><span class="attribute">0060</span>-<span class="number">006</span>F   <span class="number">20</span> <span class="number">74</span> <span class="number">68</span> <span class="number">65</span> <span class="number">20</span> <span class="number">66</span> <span class="number">69</span> <span class="number">72</span> <span class="number">73</span> <span class="number">74</span> <span class="number">20</span> <span class="number">63</span> <span class="number">68</span> <span class="number">75</span> <span class="number">6</span>e <span class="number">6</span>b    the first chunk</span><br><span class="line"><span class="attribute">0070</span>-<span class="number">007</span>F   <span class="number">0</span>d <span class="number">0</span>a <span class="number">0</span>d <span class="number">0</span>a <span class="number">31</span> <span class="number">41</span> <span class="number">0</span>d <span class="number">0</span>a <span class="number">61</span> <span class="number">6</span>e <span class="number">64</span> <span class="number">20</span> <span class="number">74</span> <span class="number">68</span> <span class="number">69</span> <span class="number">73</span>   ....<span class="number">1</span>A..and this</span><br><span class="line"><span class="attribute">0080</span>-<span class="number">008</span>F   <span class="number">20</span> <span class="number">69</span> <span class="number">73</span> <span class="number">20</span> <span class="number">74</span> <span class="number">68</span> <span class="number">65</span> <span class="number">20</span> <span class="number">73</span> <span class="number">65</span> <span class="number">63</span> <span class="number">6</span>f <span class="number">6</span>e <span class="number">64</span> <span class="number">20</span> <span class="number">6</span>f    is the second o</span><br><span class="line"><span class="attribute">0090</span>-<span class="number">009</span>F   <span class="number">6</span>e <span class="number">65</span> <span class="number">0</span>d <span class="number">0</span>a <span class="number">30</span> <span class="number">0</span>d <span class="number">0</span>a <span class="number">0</span>d <span class="number">0</span>a                        ne..<span class="number">0</span>....</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7-http/"># 技术工具 - http</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/21/%E7%AE%80%E6%98%93%E7%9A%84http%E6%9C%8D%E5%8A%A1%E7%AB%AF%EF%BC%88C%E8%AF%AD%E8%A8%80%E5%AE%9E%E7%8E%B0%EF%BC%89/">简易的 http 服务端（C 语言实现）</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/21/gdb%E7%9A%84%E8%B0%83%E8%AF%95%E6%96%B9%E6%B3%95/">gdb的调试方法简介</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
