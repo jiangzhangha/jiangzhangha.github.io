@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>docker 的网络命令空间 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">docker 的网络命令空间</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;12:32:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E4%BA%91%E8%AE%A1%E7%AE%97/">云计算</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="docker-的网络命令空间"><a href="#docker-的网络命令空间" class="headerlink" title="docker 的网络命令空间"></a>docker 的网络命令空间</h1><p>在 docker 创建后，通过 docker inspect 命令，可以获取 docker 网络命令空间的描述符路径：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br></pre></td><td class="code"><pre><span class="line">[root@vac_master0 ~]<span class="comment"># docker ps -a</span></span><br><span class="line">CONTAINER ID        IMAGE                                           COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">697950c08c2e        192.168.84.83:5000/x86_64/mpu/utelnetd:latest   <span class="string">&quot;/usr/sbin/myUtelnetd&quot;</span>   6 days ago          Up 6 days                               tpa_vac</span><br><span class="line">14326fe79a36        registry:2.6.2                                  <span class="string">&quot;/entrypoint.sh /e...&quot;</span>   2 weeks ago         Up 6 days                               lpm_registry</span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment"># docker inspect tpa_vac</span></span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="string">&quot;Id&quot;</span>: <span class="string">&quot;697950c08c2e11425b1e1ea6ddc4e60fbff929e0746bb65ef328d0f6e08d2263&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Created&quot;</span>: <span class="string">&quot;2021-02-02T03:52:29.709566861Z&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Path&quot;</span>: <span class="string">&quot;/usr/sbin/myUtelnetd&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Args&quot;</span>: [],</span><br><span class="line">        <span class="string">&quot;State&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;Status&quot;</span>: <span class="string">&quot;running&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Running&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="string">&quot;Paused&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;Restarting&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;OOMKilled&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;Dead&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;Pid&quot;</span>: 4940,</span><br><span class="line">            <span class="string">&quot;ExitCode&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;Error&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;StartedAt&quot;</span>: <span class="string">&quot;2021-02-02T03:52:31.00728144Z&quot;</span>,</span><br><span class="line">            <span class="string">&quot;FinishedAt&quot;</span>: <span class="string">&quot;0001-01-01T00:00:00Z&quot;</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;Image&quot;</span>: <span class="string">&quot;sha256:97fffa246d3c50f6e64f99654012616826252ecefd39859bdeca0c08e6fa3e53&quot;</span>,</span><br><span class="line">        <span class="string">&quot;ResolvConfPath&quot;</span>: <span class="string">&quot;/var/lib/docker/containers/697950c08c2e11425b1e1ea6ddc4e60fbff929e0746bb65ef328d0f6e08d2263/resolv.conf&quot;</span>,</span><br><span class="line">        <span class="string">&quot;HostnamePath&quot;</span>: <span class="string">&quot;/var/lib/docker/containers/697950c08c2e11425b1e1ea6ddc4e60fbff929e0746bb65ef328d0f6e08d2263/hostname&quot;</span>,</span><br><span class="line">        <span class="string">&quot;HostsPath&quot;</span>: <span class="string">&quot;/var/lib/docker/containers/697950c08c2e11425b1e1ea6ddc4e60fbff929e0746bb65ef328d0f6e08d2263/hosts&quot;</span>,</span><br><span class="line">        <span class="string">&quot;LogPath&quot;</span>: <span class="string">&quot;/var/lib/docker/containers/697950c08c2e11425b1e1ea6ddc4e60fbff929e0746bb65ef328d0f6e08d2263/697950c08c2e11425b1e1ea6ddc4e60fbff929e0746bb65ef328d0f6e08d2263-json.log&quot;</span>,</span><br><span class="line">        <span class="string">&quot;Name&quot;</span>: <span class="string">&quot;/tpa_vac&quot;</span>,</span><br><span class="line">        <span class="string">&quot;RestartCount&quot;</span>: 0,</span><br><span class="line">        <span class="string">&quot;Driver&quot;</span>: <span class="string">&quot;overlay2&quot;</span>,</span><br><span class="line">        <span class="string">&quot;MountLabel&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;ProcessLabel&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;AppArmorProfile&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">        <span class="string">&quot;ExecIDs&quot;</span>: null,</span><br><span class="line">        <span class="string">&quot;HostConfig&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;Binds&quot;</span>: [</span><br><span class="line">                <span class="string">&quot;/tmp/zte1:/zte1:ro&quot;</span>,</span><br><span class="line">                <span class="string">&quot;/tmp/zte2:/zte2:rw&quot;</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="string">&quot;ContainerIDFile&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;LogConfig&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;Type&quot;</span>: <span class="string">&quot;json-file&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Config&quot;</span>: &#123;&#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;NetworkMode&quot;</span>: <span class="string">&quot;bridge&quot;</span>,</span><br><span class="line">            <span class="string">&quot;PortBindings&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;RestartPolicy&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;Name&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">                <span class="string">&quot;MaximumRetryCount&quot;</span>: 0</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">&quot;AutoRemove&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;VolumeDriver&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;VolumesFrom&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;CapAdd&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;CapDrop&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;Dns&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;DnsOptions&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;DnsSearch&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;ExtraHosts&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;GroupAdd&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;IpcMode&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Cgroup&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Links&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;OomScoreAdj&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;PidMode&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Privileged&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="string">&quot;PublishAllPorts&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;ReadonlyRootfs&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;SecurityOpt&quot;</span>: [</span><br><span class="line">                <span class="string">&quot;label=disable&quot;</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="string">&quot;UTSMode&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;UsernsMode&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;ShmSize&quot;</span>: 67108864,</span><br><span class="line">            <span class="string">&quot;Runtime&quot;</span>: <span class="string">&quot;runc&quot;</span>,</span><br><span class="line">            <span class="string">&quot;ConsoleSize&quot;</span>: [</span><br><span class="line">                0,</span><br><span class="line">                0</span><br><span class="line">            ],</span><br><span class="line">            <span class="string">&quot;Isolation&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;CpuShares&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;Memory&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;NanoCpus&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;CgroupParent&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;BlkioWeight&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;BlkioWeightDevice&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;BlkioDeviceReadBps&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;BlkioDeviceWriteBps&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;BlkioDeviceReadIOps&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;BlkioDeviceWriteIOps&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;CpuPeriod&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;CpuQuota&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;CpuRealtimePeriod&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;CpuRealtimeRuntime&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;CpusetCpus&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;CpusetMems&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Devices&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;DiskQuota&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;KernelMemory&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;MemoryReservation&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;MemorySwap&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;MemorySwappiness&quot;</span>: -1,</span><br><span class="line">            <span class="string">&quot;OomKillDisable&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;PidsLimit&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;Ulimits&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;CpuCount&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;CpuPercent&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;IOMaximumIOps&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;IOMaximumBandwidth&quot;</span>: 0</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;GraphDriver&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;Name&quot;</span>: <span class="string">&quot;overlay2&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Data&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;LowerDir&quot;</span>: <span class="string">&quot;/var/lib/docker/overlay2/99fdce599f2a41b6bd5eab50d363e90b22be54ca4e3167c049fd9b8896b4bedc-init/diff:/var/lib/docker/overlay2/1522f636d4e1653db28d410acc6391e68d23e6259d36935f6e71c4865f928765/diff:/var/lib/docker/overlay2/da28397beec32ac4f8e961e1afebf7610cf9781c1880ea82359f3a0c771ad663/diff:/var/lib/docker/overlay2/700209b0e540c1de67307d8c0b49c6867f13e79b34235dbaf25a9ea4c4eb2fbd/diff:/var/lib/docker/overlay2/ef3c7ba0da6f986e6dcbad105369ee468037ddbbe159f13f0ae69422a90af059/diff&quot;</span>,</span><br><span class="line">                <span class="string">&quot;MergedDir&quot;</span>: <span class="string">&quot;/var/lib/docker/overlay2/99fdce599f2a41b6bd5eab50d363e90b22be54ca4e3167c049fd9b8896b4bedc/merged&quot;</span>,</span><br><span class="line">                <span class="string">&quot;UpperDir&quot;</span>: <span class="string">&quot;/var/lib/docker/overlay2/99fdce599f2a41b6bd5eab50d363e90b22be54ca4e3167c049fd9b8896b4bedc/diff&quot;</span>,</span><br><span class="line">                <span class="string">&quot;WorkDir&quot;</span>: <span class="string">&quot;/var/lib/docker/overlay2/99fdce599f2a41b6bd5eab50d363e90b22be54ca4e3167c049fd9b8896b4bedc/work&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;Mounts&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;Type&quot;</span>: <span class="string">&quot;bind&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Source&quot;</span>: <span class="string">&quot;/tmp/zte1&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Destination&quot;</span>: <span class="string">&quot;/zte1&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Mode&quot;</span>: <span class="string">&quot;ro&quot;</span>,</span><br><span class="line">                <span class="string">&quot;RW&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">                <span class="string">&quot;Propagation&quot;</span>: <span class="string">&quot;rprivate&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;Type&quot;</span>: <span class="string">&quot;bind&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Source&quot;</span>: <span class="string">&quot;/tmp/zte2&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Destination&quot;</span>: <span class="string">&quot;/zte2&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Mode&quot;</span>: <span class="string">&quot;rw&quot;</span>,</span><br><span class="line">                <span class="string">&quot;RW&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">                <span class="string">&quot;Propagation&quot;</span>: <span class="string">&quot;rprivate&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="string">&quot;Config&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;Hostname&quot;</span>: <span class="string">&quot;697950c08c2e&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Domainname&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;User&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;AttachStdin&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;AttachStdout&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;AttachStderr&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;Tty&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="string">&quot;OpenStdin&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">            <span class="string">&quot;StdinOnce&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;Env&quot;</span>: [</span><br><span class="line">                <span class="string">&quot;DEPLOYMODE=auto/manual&quot;</span>,</span><br><span class="line">                <span class="string">&quot;MSStatus=Master&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Image=x86_64/mpu/utelnetd:latest&quot;</span>,</span><br><span class="line">                <span class="string">&quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="string">&quot;Cmd&quot;</span>: [</span><br><span class="line">                <span class="string">&quot;/usr/sbin/myUtelnetd&quot;</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="string">&quot;Image&quot;</span>: <span class="string">&quot;192.168.84.83:5000/x86_64/mpu/utelnetd:latest&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Volumes&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;WorkingDir&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Entrypoint&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;OnBuild&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;Labels&quot;</span>: &#123;&#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">&quot;NetworkSettings&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;Bridge&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;SandboxID&quot;</span>: <span class="string">&quot;6b0ccfc44387184e160d916091dbf55900a5700ffebe66566ec128d945987a89&quot;</span>,</span><br><span class="line">            <span class="string">&quot;HairpinMode&quot;</span>: <span class="literal">false</span>,</span><br><span class="line">            <span class="string">&quot;LinkLocalIPv6Address&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;LinkLocalIPv6PrefixLen&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;Ports&quot;</span>: &#123;&#125;,</span><br><span class="line">            <span class="string">&quot;SandboxKey&quot;</span>: <span class="string">&quot;/var/run/docker/netns/6b0ccfc44387&quot;</span>,</span><br><span class="line">            <span class="string">&quot;SecondaryIPAddresses&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;SecondaryIPv6Addresses&quot;</span>: null,</span><br><span class="line">            <span class="string">&quot;EndpointID&quot;</span>: <span class="string">&quot;ec5e90845dd7bc9322ea56e44ad9459ee82d6b90bb63496b25cdce5f3e97eba3&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Gateway&quot;</span>: <span class="string">&quot;172.17.6.252&quot;</span>,</span><br><span class="line">            <span class="string">&quot;GlobalIPv6Address&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;GlobalIPv6PrefixLen&quot;</span>: 0,</span><br><span class="line">            <span class="string">&quot;IPAddress&quot;</span>: <span class="string">&quot;172.17.6.1&quot;</span>,</span><br><span class="line">            <span class="string">&quot;IPPrefixLen&quot;</span>: 24,</span><br><span class="line">            <span class="string">&quot;IPv6Gateway&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">            <span class="string">&quot;MacAddress&quot;</span>: <span class="string">&quot;02:42:ac:11:06:01&quot;</span>,</span><br><span class="line">            <span class="string">&quot;Networks&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;bridge&quot;</span>: &#123;</span><br><span class="line">                    <span class="string">&quot;IPAMConfig&quot;</span>: null,</span><br><span class="line">                    <span class="string">&quot;Links&quot;</span>: null,</span><br><span class="line">                    <span class="string">&quot;Aliases&quot;</span>: null,</span><br><span class="line">                    <span class="string">&quot;NetworkID&quot;</span>: <span class="string">&quot;2d55e5ee8e1d1dac06484c56613273c4c9a5b6aeb9b82a1d67e5633366286e4a&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;EndpointID&quot;</span>: <span class="string">&quot;ec5e90845dd7bc9322ea56e44ad9459ee82d6b90bb63496b25cdce5f3e97eba3&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;Gateway&quot;</span>: <span class="string">&quot;172.17.6.252&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;IPAddress&quot;</span>: <span class="string">&quot;172.17.6.1&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;IPPrefixLen&quot;</span>: 24,</span><br><span class="line">                    <span class="string">&quot;IPv6Gateway&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;GlobalIPv6Address&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">                    <span class="string">&quot;GlobalIPv6PrefixLen&quot;</span>: 0,</span><br><span class="line">                    <span class="string">&quot;MacAddress&quot;</span>: <span class="string">&quot;02:42:ac:11:06:01&quot;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+
+<p>通过 docker inspect 命令，获取 JSON 格式数据中 NetworkSettings 字段下的 SandboxKey 字段，即 /var/run/docker/netns/6b0ccfc44387。</p>
+<p>通过将其软连接至 /var/run/netns/{容器名称} 路径后，可方便通过 ip netns 命令操作容器的网络命名空间：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@vac_master0 ~]<span class="comment"># ip netns list</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment"># ln -s /var/run/docker/netns/6b0ccfc44387 /var/run/netns/tpa_vac</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment"># ll /var/run/netns/</span></span><br><span class="line">total 0</span><br><span class="line">lrwxrwxrwx. 1 root root 34 Feb  8 13:51 tpa_vac -&gt; /var/run/docker/netns/6b0ccfc44387</span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br><span class="line">[root@vac_master0 ~]<span class="comment"># ip netns</span></span><br><span class="line">tpa_vac (id: 0)</span><br><span class="line">[root@vac_master0 ~]<span class="comment">#</span></span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/docker/"># docker</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/Consul%E4%B8%8E%E8%B7%A8%E4%B8%BB%E6%9C%BADocker%E9%80%9A%E4%BF%A1/">Consul 与跨主机 Docker 通信</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
