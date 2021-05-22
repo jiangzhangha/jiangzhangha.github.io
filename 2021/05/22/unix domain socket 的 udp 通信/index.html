@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>unix domain socket 的 UDP 通信 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">unix domain socket 的 UDP 通信</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;11:36:22</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E7%BD%91%E7%BB%9C%E6%8A%80%E6%9C%AF/">网络技术</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="什么是-Unix-Domain-Socket"><a href="#什么是-Unix-Domain-Socket" class="headerlink" title="什么是 Unix Domain Socket"></a>什么是 Unix Domain Socket</h1><p>一般将 socket 称为套接字，我们经常将 socket 指为网络通信的 socket，这些 socket 用于在网络中的不同设备之间的通信。但是 socket 也可以用于在同一台设备中（准确点，应该是同一 OS）的不用进程之间的通信，这样的 socket，被称为 <code>unix domain socket</code>。</p>
+<h1 id="Unix-Domain-Socket-的特点"><a href="#Unix-Domain-Socket-的特点" class="headerlink" title="Unix Domain Socket 的特点"></a>Unix Domain Socket 的特点</h1><p>一般 <code>unix domain socket</code> 具有以下的特点：</p>
+<ol>
+<li><code>unix domain socket</code> 比 TCP、IP 在本地通信更快，因为 <code>unix domain socket</code> 不经过网络协议栈，不需要打包、拆包、计算校验、维护序列号与应答等，只是将应用层数据从一个进程拷贝到另一个进程。</li>
+<li><code>unix domain socket</code> 也提供面向流与面向数据包的 API 接口，分别类似于 TCP 与 UDP。但是面向数据包的 <code>unix domain socket</code> 也是可靠的，消息不会丢失，也不会乱序。</li>
+<li><code>unix domain socket</code> 是全双工。</li>
+</ol>
+<h1 id="Unix-Domain-Socket-的-API"><a href="#Unix-Domain-Socket-的-API" class="headerlink" title="Unix Domain Socket 的 API"></a>Unix Domain Socket 的 API</h1><p>创建 <code>unix domain socket</code> 的套接字，也是使用函数 <code>socket</code>，但是与网络 socket 的入参有些不同，主要比较如下：</p>
+<table>
+<thead>
+<tr>
+<th>比较项</th>
+<th>网络 socket</th>
+<th>Unix Domain Socket</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>地址族</td>
+<td>AF_INET、PF_INET</td>
+<td>AF_UNIX</td>
+</tr>
+<tr>
+<td>地址格式</td>
+<td>sockaddr_in（表示 IP 地址与 port 端口）</td>
+<td>sockaddr_un（表示本地文件）</td>
+</tr>
+<tr>
+<td>type</td>
+<td>SOCK_STREAM、SOCK_DGRAM、SOCK_RAW</td>
+<td>SOCK_STREAM、SOCK_DGRAM、SOCK_RAW</td>
+</tr>
+</tbody></table>
+<p>对于 <code>unix domain socket</code>，绑定的地址不是网络 socket 的 IP 地址与端口号的形式，而是形式上为文件系统中的一个文件，但是该文件不是普通类型的文件，不能进行普通文件的读写操作，不能使用文本编辑器打开编辑，只能以 socket 的方式对其进行读写操作。比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu0_docker ~]# ll /tmp/</span><br><span class="line">total 0</span><br><span class="line">srwxr-x---. 1 root root 0 May 19 10:02 omci_cli_log</span><br><span class="line">srwxr-x---. 1 root root 0 May 19 09:57 omci_log</span><br></pre></td></tr></table></figure>
+
+
+<p>地址格式比较为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> &#123;</span></span><br><span class="line">    <span class="keyword">sa_family_t</span> sin_family;  <span class="comment">/* address family, AF_INET */</span></span><br><span class="line">    <span class="keyword">in_port_t</span>   sin_port;    <span class="comment">/* port in network byte order */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span> <span class="comment">/* internet address */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> UNIX_PATH_MAX  108</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_un</span> &#123;</span></span><br><span class="line">    <span class="keyword">sa_family_t</span>  sin_family; <span class="comment">/* address family, AF_UNIX */</span></span><br><span class="line">    <span class="keyword">char</span> sun_path[UNIX_PATH_MAX]; <span class="comment">/* path name*/</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+<p>对于路径名，分为两种，即普通路径名与抽象路径名。</p>
+<ol>
+<li><strong>普通路径名</strong>：是一个正常的字符串，也就是，sun_path 字段是以空字符结尾的绝对路径字符串；</li>
+<li><strong>抽象路径名</strong>：是 Linux 特有的一个特性，允许将一个 domain socket 绑定到一个名字上，而不会在文件系统中创建这个名字的 socket 文件。必须将 sun_path 的第一个字节设置为 NULL，即空字符，系统会将 sun_path 除了第一个字节之后余下的所有字节当作抽象名字，也就是说在解析抽象路径名时，需要用到 sun_path 中的所有字节。因为不会在文件系统中创建文件，对于抽象路径名来说，就不需要担心与文件系统中已经存在的文件产生名字冲突，也不需要在使用完套接字后删除附带的文件。当这个套接字被关闭后，系统自动删除这个抽象名。另外，抽象路径名还可以解决路径权限的问题。</li>
+</ol>
+<h1 id="Unix-Domain-Socket-的面向数据包的示例代码"><a href="#Unix-Domain-Socket-的面向数据包的示例代码" class="headerlink" title="Unix Domain Socket 的面向数据包的示例代码"></a>Unix Domain Socket 的面向数据包的示例代码</h1><h2 id="服务端代码"><a href="#服务端代码" class="headerlink" title="服务端代码"></a>服务端代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/un.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span>* server_file = <span class="string">&quot;server.sock&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> fd = socket(AF_UNIX,SOCK_DGRAM,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;socket&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_un</span> <span class="title">addr</span>;</span></span><br><span class="line">    <span class="built_in">memset</span>(&amp;addr,<span class="number">0</span>,<span class="keyword">sizeof</span>(addr));</span><br><span class="line">    addr.sun_family = AF_UNIX;</span><br><span class="line">    <span class="built_in">strcpy</span>(addr.sun_path,server_file);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (access(addr.sun_path,<span class="number">0</span>) != <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        remove(addr.sun_path);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(bind(fd,(sockaddr*)&amp;addr,<span class="keyword">sizeof</span>(addr)) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;bind&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_un</span> <span class="title">clientaddr</span>;</span></span><br><span class="line">    <span class="keyword">socklen_t</span> len = <span class="keyword">sizeof</span>(clientaddr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> msgrecv[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">memset</span>(msgrecv,<span class="string">&#x27;\0&#x27;</span>,<span class="number">1024</span>);</span><br><span class="line">        <span class="keyword">int</span> size = recvfrom(fd,msgrecv,<span class="keyword">sizeof</span>(msgrecv),<span class="number">0</span>,(sockaddr*)&amp;clientaddr,&amp;len);</span><br><span class="line">        <span class="keyword">if</span> (size &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            perror(<span class="string">&quot;recv&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;I&#x27;m server,receive a msg: &quot;</span> &lt;&lt; msgrecv  &lt;&lt; <span class="string">&quot; from: &quot;</span> &lt;&lt; clientaddr.sun_path &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">strncmp</span>(<span class="string">&quot;quit&quot;</span>,msgrecv,<span class="number">4</span>) == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Server is exiting!&quot;</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span> *p = <span class="string">&quot;OK,I got id!&quot;</span>;</span><br><span class="line">        <span class="keyword">int</span> ssize = sendto(fd,p,<span class="built_in">strlen</span>(p),<span class="number">0</span>,(sockaddr*)&amp;clientaddr,len);</span><br><span class="line">        <span class="keyword">if</span> (ssize &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            perror(<span class="string">&quot;sendto&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (close(fd) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;close&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="客户端代码"><a href="#客户端代码" class="headerlink" title="客户端代码"></a>客户端代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/un.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span>* server_file = <span class="string">&quot;server.sock&quot;</span>;</span><br><span class="line"><span class="keyword">char</span>* client_file = <span class="string">&quot;client.sock&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> fd = socket(AF_UNIX,SOCK_DGRAM,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;socket&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_un</span> <span class="title">addr</span>;</span></span><br><span class="line">    <span class="built_in">memset</span>(&amp;addr,<span class="number">0</span>,<span class="keyword">sizeof</span>(addr));</span><br><span class="line">    addr.sun_family = AF_UNIX;</span><br><span class="line">    <span class="built_in">strcpy</span>(addr.sun_path,client_file);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (access(addr.sun_path,<span class="number">0</span>) != <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        remove(addr.sun_path);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(bind(fd,(sockaddr*)&amp;addr,<span class="keyword">sizeof</span>(addr)) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;bind&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_un</span> <span class="title">clientaddr</span>;</span></span><br><span class="line">    <span class="keyword">socklen_t</span> len = <span class="keyword">sizeof</span>(clientaddr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> msgrecv[<span class="number">1024</span>];</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_un</span> <span class="title">serveraddr</span>;</span></span><br><span class="line">    <span class="built_in">memset</span>(&amp;serveraddr,<span class="number">0</span>,<span class="keyword">sizeof</span>(serveraddr));</span><br><span class="line">    serveraddr.sun_family = AF_UNIX;</span><br><span class="line">    <span class="built_in">strcpy</span>(serveraddr.sun_path,server_file);</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> *p = <span class="string">&quot;Hello,how are you?&quot;</span>;</span><br><span class="line">    <span class="keyword">int</span> ssize = sendto(fd,p,<span class="built_in">strlen</span>(p),<span class="number">0</span>,(sockaddr*)&amp;serveraddr,len);</span><br><span class="line">    <span class="keyword">if</span> (ssize &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;sendto&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> size = recvfrom(fd,msgrecv,<span class="keyword">sizeof</span>(msgrecv),<span class="number">0</span>,(sockaddr*)&amp;serveraddr,&amp;len);</span><br><span class="line">    <span class="keyword">if</span> (size &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;recv&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;I&#x27;m client，receive a msg :&quot;</span> &lt;&lt; msgrecv &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">    sleep(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* goodbye = <span class="string">&quot;quit&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (sendto(fd,goodbye,<span class="built_in">strlen</span>(goodbye),<span class="number">0</span>,(sockaddr*)&amp;serveraddr,len) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;sendto&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (close(fd) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;close&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/socket/"># socket</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/22/Linux%E5%BA%95%E5%B1%82%E7%9A%84socket%E5%9C%B0%E5%9D%80/">Linux底层的socket地址</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/macvlan%E8%99%9A%E6%8B%9F%E6%8A%80%E6%9C%AF%E7%9A%84bridge%E6%A8%A1%E5%BC%8F/">macvlan 虚拟技术的 bridge 模式</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

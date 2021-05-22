@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>curl命令使用简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">curl命令使用简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;11:11:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="curl"><a href="#curl" class="headerlink" title="curl"></a>curl</h2><p><code>cURL</code> 是一个开源项目，其主要的产品是命令行工具 <code>curl</code>，以及 <code>C</code> 语言 <code>API</code> 库 <code>libcurl</code>。这两者的功能是基于网络协议，对指定的 <code>URL</code> 进行网络传输。</p>
+<p><code>cURL</code> 设计任何网络协议传输，不涉及对具体数据的具体处理。</p>
+<p><code>cURL</code> 的官方网站为：<a target="_blank" rel="noopener" href="https://curl.haxx.se/">https://curl.haxx.se/</a></p>
+<h2 id="查看帮助"><a href="#查看帮助" class="headerlink" title="查看帮助"></a>查看帮助</h2><p>通过 <code>--help</code> 或者 <code>-h</code> 选项可以查看 <code>curl</code> 命令的帮助信息，具体为:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><span class="line">[jamza@jamza-vm etc]$ curl -h</span><br><span class="line">Usage: curl [options...] &lt;url&gt;</span><br><span class="line">Options: (H) means HTTP/HTTPS only, (F) means FTP only</span><br><span class="line">     --anyauth       Pick &quot;any&quot; authentication method (H)</span><br><span class="line"> -a, --append        Append to target file when uploading (F/SFTP)</span><br><span class="line">     --basic         Use HTTP Basic Authentication (H)</span><br><span class="line">     --cacert FILE   CA certificate to verify peer against (SSL)</span><br><span class="line">     --capath DIR    CA directory to verify peer against (SSL)</span><br><span class="line"> -E, --cert CERT[:PASSWD] Client certificate file and password (SSL)</span><br><span class="line">     --cert-type TYPE Certificate file type (DER/PEM/ENG) (SSL)</span><br><span class="line">     --ciphers LIST  SSL ciphers to use (SSL)</span><br><span class="line">     --compressed    Request compressed response (using deflate or gzip)</span><br><span class="line"> -K, --config FILE   Specify which config file to read</span><br><span class="line">     --connect-timeout SECONDS  Maximum time allowed for connection</span><br><span class="line"> -C, --continue-at OFFSET  Resumed transfer offset</span><br><span class="line"> -b, --cookie STRING/FILE  String or file to read cookies from (H)</span><br><span class="line"> -c, --cookie-jar FILE  Write cookies to this file after operation (H)</span><br><span class="line">     --create-dirs   Create necessary local directory hierarchy</span><br><span class="line">     --crlf          Convert LF to CRLF in upload</span><br><span class="line">     --crlfile FILE  Get a CRL list in PEM format from the given file</span><br><span class="line"> -d, --data DATA     HTTP POST data (H)</span><br><span class="line">     --data-ascii DATA  HTTP POST ASCII data (H)</span><br><span class="line">     --data-binary DATA  HTTP POST binary data (H)</span><br><span class="line">     --data-urlencode DATA  HTTP POST data url encoded (H)</span><br><span class="line">     --delegation STRING GSS-API delegation permission</span><br><span class="line">     --digest        Use HTTP Digest Authentication (H)</span><br><span class="line">     --disable-eprt  Inhibit using EPRT or LPRT (F)</span><br><span class="line">     --disable-epsv  Inhibit using EPSV (F)</span><br><span class="line"> -D, --dump-header FILE  Write the headers to this file</span><br><span class="line">     --egd-file FILE  EGD socket path for random data (SSL)</span><br><span class="line">     --engine ENGINGE  Crypto engine (SSL). &quot;--engine list&quot; for list</span><br><span class="line"> -f, --fail          Fail silently (no output at all) on HTTP errors (H)</span><br><span class="line"> -F, --form CONTENT  Specify HTTP multipart POST data (H)</span><br><span class="line">     --form-string STRING  Specify HTTP multipart POST data (H)</span><br><span class="line">     --ftp-account DATA  Account data string (F)</span><br><span class="line">     --ftp-alternative-to-user COMMAND  String to replace &quot;USER [name]&quot; (F)</span><br><span class="line">     --ftp-create-dirs  Create the remote dirs if not present (F)</span><br><span class="line">     --ftp-method [MULTICWD/NOCWD/SINGLECWD] Control CWD usage (F)</span><br><span class="line">     --ftp-pasv      Use PASV/EPSV instead of PORT (F)</span><br><span class="line"> -P, --ftp-port ADR  Use PORT with given address instead of PASV (F)</span><br><span class="line">     --ftp-skip-pasv-ip Skip the IP address for PASV (F)</span><br><span class="line">     --ftp-pret      Send PRET before PASV (for drftpd) (F)</span><br><span class="line">     --ftp-ssl-ccc   Send CCC after authenticating (F)</span><br><span class="line">     --ftp-ssl-ccc-mode ACTIVE/PASSIVE  Set CCC mode (F)</span><br><span class="line">     --ftp-ssl-control Require SSL/TLS for ftp login, clear for transfer (F)</span><br><span class="line"> -G, --get           Send the -d data with a HTTP GET (H)</span><br><span class="line"> -g, --globoff       Disable URL sequences and ranges using &#123;&#125; and []</span><br><span class="line"> -H, --header LINE   Custom header to pass to server (H)</span><br><span class="line"> -I, --head          Show document info only</span><br><span class="line"> -h, --help          This help text</span><br><span class="line">     --hostpubmd5 MD5  Hex encoded MD5 string of the host public key. (SSH)</span><br><span class="line"> -0, --http1.0       Use HTTP 1.0 (H)</span><br><span class="line">     --ignore-content-length  Ignore the HTTP Content-Length header</span><br><span class="line"> -i, --include       Include protocol headers in the output (H/F)</span><br><span class="line"> -k, --insecure      Allow connections to SSL sites without certs (H)</span><br><span class="line">     --interface INTERFACE  Specify network interface/address to use</span><br><span class="line"> -4, --ipv4          Resolve name to IPv4 address</span><br><span class="line"> -6, --ipv6          Resolve name to IPv6 address</span><br><span class="line"> -j, --junk-session-cookies Ignore session cookies read from file (H)</span><br><span class="line">     --keepalive-time SECONDS  Interval between keepalive probes</span><br><span class="line">     --key KEY       Private key file name (SSL/SSH)</span><br><span class="line">     --key-type TYPE Private key file type (DER/PEM/ENG) (SSL)</span><br><span class="line">     --krb LEVEL     Enable Kerberos with specified security level (F)</span><br><span class="line">     --libcurl FILE  Dump libcurl equivalent code of this command line</span><br><span class="line">     --limit-rate RATE  Limit transfer speed to this rate</span><br><span class="line"> -l, --list-only     List only names of an FTP directory (F)</span><br><span class="line">     --local-port RANGE  Force use of these local port numbers</span><br><span class="line"> -L, --location      Follow redirects (H)</span><br><span class="line">     --location-trusted like --location and send auth to other hosts (H)</span><br><span class="line"> -M, --manual        Display the full manual</span><br><span class="line">     --mail-from FROM  Mail from this address</span><br><span class="line">     --mail-rcpt TO  Mail to this receiver(s)</span><br><span class="line">     --mail-auth AUTH  Originator address of the original email</span><br><span class="line">     --max-filesize BYTES  Maximum file size to download (H/F)</span><br><span class="line">     --max-redirs NUM  Maximum number of redirects allowed (H)</span><br><span class="line"> -m, --max-time SECONDS  Maximum time allowed for the transfer</span><br><span class="line">     --metalink      Process given URLs as metalink XML file</span><br><span class="line">     --negotiate     Use HTTP Negotiate Authentication (H)</span><br><span class="line"> -n, --netrc         Must read .netrc for user name and password</span><br><span class="line">     --netrc-optional Use either .netrc or URL; overrides -n</span><br><span class="line">     --netrc-file FILE  Set up the netrc filename to use</span><br><span class="line"> -N, --no-buffer     Disable buffering of the output stream</span><br><span class="line">     --no-keepalive  Disable keepalive use on the connection</span><br><span class="line">     --no-sessionid  Disable SSL session-ID reusing (SSL)</span><br><span class="line">     --noproxy       List of hosts which do not use proxy</span><br><span class="line">     --ntlm          Use HTTP NTLM authentication (H)</span><br><span class="line"> -o, --output FILE   Write output to &lt;file&gt; instead of stdout</span><br><span class="line">     --pass PASS     Pass phrase for the private key (SSL/SSH)</span><br><span class="line">     --post301       Do not switch to GET after following a 301 redirect (H)</span><br><span class="line">     --post302       Do not switch to GET after following a 302 redirect (H)</span><br><span class="line">     --post303       Do not switch to GET after following a 303 redirect (H)</span><br><span class="line"><span class="meta"> -#</span><span class="bash">, --progress-bar  Display transfer progress as a progress bar</span></span><br><span class="line">     --proto PROTOCOLS  Enable/disable specified protocols</span><br><span class="line">     --proto-redir PROTOCOLS  Enable/disable specified protocols on redirect</span><br><span class="line"> -x, --proxy [PROTOCOL://]HOST[:PORT] Use proxy on given port</span><br><span class="line">     --proxy-anyauth Pick &quot;any&quot; proxy authentication method (H)</span><br><span class="line">     --proxy-basic   Use Basic authentication on the proxy (H)</span><br><span class="line">     --proxy-digest  Use Digest authentication on the proxy (H)</span><br><span class="line">     --proxy-negotiate Use Negotiate authentication on the proxy (H)</span><br><span class="line">     --proxy-ntlm    Use NTLM authentication on the proxy (H)</span><br><span class="line"> -U, --proxy-user USER[:PASSWORD]  Proxy user and password</span><br><span class="line">     --proxy1.0 HOST[:PORT]  Use HTTP/1.0 proxy on given port</span><br><span class="line"> -p, --proxytunnel   Operate through a HTTP proxy tunnel (using CONNECT)</span><br><span class="line">     --pubkey KEY    Public key file name (SSH)</span><br><span class="line"> -Q, --quote CMD     Send command(s) to server before transfer (F/SFTP)</span><br><span class="line">     --random-file FILE  File for reading random data from (SSL)</span><br><span class="line"> -r, --range RANGE   Retrieve only the bytes within a range</span><br><span class="line">     --raw           Do HTTP &quot;raw&quot;, without any transfer decoding (H)</span><br><span class="line"> -e, --referer       Referer URL (H)</span><br><span class="line"> -J, --remote-header-name Use the header-provided filename (H)</span><br><span class="line"> -O, --remote-name   Write output to a file named as the remote file</span><br><span class="line">     --remote-name-all Use the remote file name for all URLs</span><br><span class="line"> -R, --remote-time   Set the remote file&#x27;s time on the local output</span><br><span class="line"> -X, --request COMMAND  Specify request command to use</span><br><span class="line">     --resolve HOST:PORT:ADDRESS  Force resolve of HOST:PORT to ADDRESS</span><br><span class="line">     --retry NUM   Retry request NUM times if transient problems occur</span><br><span class="line">     --retry-delay SECONDS When retrying, wait this many seconds between each</span><br><span class="line">     --retry-max-time SECONDS  Retry only within this period</span><br><span class="line"> -S, --show-error    Show error. With -s, make curl show errors when they occur</span><br><span class="line"> -s, --silent        Silent mode. Don&#x27;t output anything</span><br><span class="line">     --socks4 HOST[:PORT]  SOCKS4 proxy on given host + port</span><br><span class="line">     --socks4a HOST[:PORT]  SOCKS4a proxy on given host + port</span><br><span class="line">     --socks5 HOST[:PORT]  SOCKS5 proxy on given host + port</span><br><span class="line">     --socks5-basic  Enable username/password auth for SOCKS5 proxies</span><br><span class="line">     --socks5-gssapi Enable GSS-API auth for SOCKS5 proxies</span><br><span class="line">     --socks5-hostname HOST[:PORT] SOCKS5 proxy, pass host name to proxy</span><br><span class="line">     --socks5-gssapi-service NAME  SOCKS5 proxy service name for gssapi</span><br><span class="line">     --socks5-gssapi-nec  Compatibility with NEC SOCKS5 server</span><br><span class="line"> -Y, --speed-limit RATE  Stop transfers below speed-limit for &#x27;speed-time&#x27; secs</span><br><span class="line"> -y, --speed-time SECONDS  Time for trig speed-limit abort. Defaults to 30</span><br><span class="line">     --ssl           Try SSL/TLS (FTP, IMAP, POP3, SMTP)</span><br><span class="line">     --ssl-reqd      Require SSL/TLS (FTP, IMAP, POP3, SMTP)</span><br><span class="line"> -2, --sslv2         Use SSLv2 (SSL)</span><br><span class="line"> -3, --sslv3         Use SSLv3 (SSL)</span><br><span class="line">     --ssl-allow-beast Allow security flaw to improve interop (SSL)</span><br><span class="line">     --stderr FILE   Where to redirect stderr. - means stdout</span><br><span class="line">     --tcp-nodelay   Use the TCP_NODELAY option</span><br><span class="line"> -t, --telnet-option OPT=VAL  Set telnet option</span><br><span class="line">     --tftp-blksize VALUE  Set TFTP BLKSIZE option (must be &gt;512)</span><br><span class="line"> -z, --time-cond TIME  Transfer based on a time condition</span><br><span class="line"> -1, --tlsv1         Use =&gt; TLSv1 (SSL)</span><br><span class="line">     --tlsv1.0       Use TLSv1.0 (SSL)</span><br><span class="line">     --tlsv1.1       Use TLSv1.1 (SSL)</span><br><span class="line">     --tlsv1.2       Use TLSv1.2 (SSL)</span><br><span class="line">     --tlsv1.3       Use TLSv1.3 (SSL)</span><br><span class="line">     --tls-max VERSION  Use TLS up to VERSION (SSL)</span><br><span class="line">     --trace FILE    Write a debug trace to the given file</span><br><span class="line">     --trace-ascii FILE  Like --trace but without the hex output</span><br><span class="line">     --trace-time    Add time stamps to trace/verbose output</span><br><span class="line">     --tr-encoding   Request compressed transfer encoding (H)</span><br><span class="line"> -T, --upload-file FILE  Transfer FILE to destination</span><br><span class="line">     --url URL       URL to work with</span><br><span class="line"> -B, --use-ascii     Use ASCII/text transfer</span><br><span class="line"> -u, --user USER[:PASSWORD]  Server user and password</span><br><span class="line">     --tlsuser USER  TLS username</span><br><span class="line">     --tlspassword STRING TLS password</span><br><span class="line">     --tlsauthtype STRING  TLS authentication type (default SRP)</span><br><span class="line">     --unix-socket FILE    Connect through this UNIX domain socket</span><br><span class="line"> -A, --user-agent STRING  User-Agent to send to server (H)</span><br><span class="line"> -v, --verbose       Make the operation more talkative</span><br><span class="line"> -V, --version       Show version number and quit</span><br><span class="line"> -w, --write-out FORMAT  What to output after completion</span><br><span class="line">     --xattr        Store metadata in extended file attributes</span><br><span class="line"> -q                 If used as the first parameter disables .curlrc</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以看出，<code>curl</code> 命令支持的选项非常的多。 需要关注常用的选项即可。一般常用的选项包括：</p>
+<ol>
+<li><code>-X, --request COMMAND  Specify request command to use</code></li>
+<li><code>-i, --include       Include protocol headers in the output (H/F)</code></li>
+<li><code>-I, --head          Show document info only</code></li>
+<li><code>-o, --output FILE   Write output to &lt;file&gt; instead of stdout</code></li>
+<li><code>-L, --location      Follow redirects (H)</code></li>
+</ol>
+<h2 id="查看网页源码"><a href="#查看网页源码" class="headerlink" title="查看网页源码"></a>查看网页源码</h2><p>直接在 <code>curl</code> 命令后面加上网址，即可获取网页源码。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[jamza@jamza-vm etc]$ curl http://www.zte.com.cn/</span><br><span class="line">&lt;!DOCTYPE HTML PUBLIC &quot;-//IETF//DTD HTML 2.0//EN&quot;&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;307 Temporary Redirect&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body bgcolor=&quot;white&quot;&gt;</span><br><span class="line">&lt;h1&gt;307 Temporary Redirect&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;The requested resource resides temporarily under a different URI.&lt;/p&gt;</span><br><span class="line">&lt;hr/&gt;Powered by ZTE&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>若需要将网页源码内容缓存下来，可以使用 <code>-o</code> 选项，具体为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -o filename http://www.zte.com.cn/</span><br></pre></td></tr></table></figure>
+
+<h2 id="显示头部信息"><a href="#显示头部信息" class="headerlink" title="显示头部信息"></a>显示头部信息</h2><p>参数 <code>-i</code> 可以显示 <code>http response</code> 的头部信息，显示还包括网页代码内容。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[jamza@jamza-vm test]$ curl -i http://www.zte.com.cn/</span><br><span class="line">HTTP/1.1 307 Temporary Redirect</span><br><span class="line">Server: ZTE</span><br><span class="line">Date: Fri, 19 Jun 2020 02:20:28 GMT</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br><span class="line">Content-Length: 280</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Location: https://www.zte.com.cn/</span><br><span class="line">X-Content-Type-Options: nosniff</span><br><span class="line">X-Xss-Protection: 1; mode=block</span><br><span class="line"></span><br><span class="line">&lt;!DOCTYPE HTML PUBLIC &quot;-//IETF//DTD HTML 2.0//EN&quot;&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;307 Temporary Redirect&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body bgcolor=&quot;white&quot;&gt;</span><br><span class="line">&lt;h1&gt;307 Temporary Redirect&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;The requested resource resides temporarily under a different URI.&lt;/p&gt;</span><br><span class="line">&lt;hr/&gt;Powered by ZTE&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>而参数 <code>-I</code> 只显示 <code>http response</code> 的头部信息，不显示网页代码内容。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[jamza@jamza-vm test]$ curl -I http://www.zte.com.cn/</span><br><span class="line">HTTP/1.1 307 Temporary Redirect</span><br><span class="line">Server: ZTE</span><br><span class="line">Date: Fri, 19 Jun 2020 02:21:42 GMT</span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br><span class="line">Content-Length: 280</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Location: https://www.zte.com.cn/</span><br><span class="line">X-Content-Type-Options: nosniff</span><br><span class="line">X-Xss-Protection: 1; mode=block</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="显示通信过程"><a href="#显示通信过程" class="headerlink" title="显示通信过程"></a>显示通信过程</h2><p>参数 <code>-v</code> 可以显示一次 <code>http</code> 通信的整个过程，包括端口连接与头部信息。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[jamza@jamza-vm test]$ curl -v http://www.zte.com.cn/</span><br><span class="line">* About to connect() to www.zte.com.cn port 80 (#0)</span><br><span class="line">*   Trying 10.30.6.85...</span><br><span class="line">* Connected to www.zte.com.cn (10.30.6.85) port 80 (#0)</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> GET / HTTP/1.1</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> User-Agent: curl/7.29.0</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> Host: www.zte.com.cn</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> Accept: */*</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"></span></span><br><span class="line"><span class="bash">&lt; HTTP/1.1 307 Temporary Redirect</span></span><br><span class="line">&lt; Server: ZTE</span><br><span class="line">&lt; Date: Fri, 19 Jun 2020 02:23:48 GMT</span><br><span class="line">&lt; Content-Type: text/html; charset=utf-8</span><br><span class="line">&lt; Content-Length: 280</span><br><span class="line">&lt; Connection: keep-alive</span><br><span class="line">&lt; Location: https://www.zte.com.cn/</span><br><span class="line">&lt; X-Content-Type-Options: nosniff</span><br><span class="line">&lt; X-Xss-Protection: 1; mode=block</span><br><span class="line">&lt;</span><br><span class="line">&lt;!DOCTYPE HTML PUBLIC &quot;-//IETF//DTD HTML 2.0//EN&quot;&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;&lt;title&gt;307 Temporary Redirect&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body bgcolor=&quot;white&quot;&gt;</span><br><span class="line">&lt;h1&gt;307 Temporary Redirect&lt;/h1&gt;</span><br><span class="line">&lt;p&gt;The requested resource resides temporarily under a different URI.&lt;/p&gt;</span><br><span class="line">&lt;hr/&gt;Powered by ZTE&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">* Connection #0 to host www.zte.com.cn left intact</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP-动词"><a href="#HTTP-动词" class="headerlink" title="HTTP 动词"></a>HTTP 动词</h2><p><code>curl</code> 的默认 <code>HTTP</code> 动词为 <code>GET</code>，使用参数 <code>-X</code> 可以支持其他的动词类型。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST www.example.com</span><br><span class="line"></span><br><span class="line">curl -X DELETE www.example.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="增加头部信息"><a href="#增加头部信息" class="headerlink" title="增加头部信息"></a>增加头部信息</h2><p>有时需要在 <code>http request</code> 之中，自行增加一个头信息。<code>--header</code> 参数就可以起到这个作用。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --header &quot;Content-Type:application/json&quot; http://example.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTP-认证"><a href="#HTTP-认证" class="headerlink" title="HTTP 认证"></a>HTTP 认证</h2><p>有些网域需要 <code>HTTP</code> 认证，这时 <code>curl</code> 需要用到 <code>--user</code> 参数。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --user name:password example.com</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/curl/"># curl</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/22/diff%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E7%AE%80%E4%BB%8B/">diff命令使用简介</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/static%E5%85%B3%E9%94%AE%E5%AD%97/">c++ 学习之 static 关键字</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>diff命令使用简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">diff命令使用简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;11:13:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><code>diff</code> 命令是 <code>Linux</code> 上比较重要的命令行工具，用于比较文本内容，并找到不相同的地方，<code>diff</code> 在命令行中打印每一行的改动之处。<code>diff</code> 程序的输出被称为补丁（<code>patch</code>），在 <code>Linux</code> 系统中还有一个 <code>patch</code> 程序，可以根据 <code>diff</code> 的输出，将文件内容更新为另一个文件内容，<code>diff</code> 是版本控制工具不可或缺的一部分。</p>
+<h2 id="命令格式"><a href="#命令格式" class="headerlink" title="命令格式"></a>命令格式</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff <span class="selector-attr">[参数选项]</span> <span class="selector-attr">[文件1 或者 目录1]</span> <span class="selector-attr">[文件2 或者 目录2]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="命令功能"><a href="#命令功能" class="headerlink" title="命令功能"></a>命令功能</h2><p><code>diff</code> 命令能比较单个文件或者目录内容。</p>
+<p>如果指定比较的是文件，则只有当输入为文本文件时才有效。以逐行的方式，比较文本文件的异同处。</p>
+<p>如果指定比较的是目录的的时候，<code>diff </code> 命令会比较两个目录下名字相同的文本文件。列出不同的二进制文件、公共子目录和只在一个目录出现的文件。</p>
+<h2 id="常用参数选项"><a href="#常用参数选项" class="headerlink" title="常用参数选项"></a>常用参数选项</h2><table>
+<thead>
+<tr>
+<th>参数选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>-a 或–text</td>
+<td>diff 预设只会逐行比较文本文件</td>
+</tr>
+<tr>
+<td>-b 或–ignore-space-change</td>
+<td>不检查空格字符</td>
+</tr>
+<tr>
+<td>-B 或–ignore-blank-lines</td>
+<td>不检查空白行</td>
+</tr>
+<tr>
+<td>-c</td>
+<td>显示全部内文，并标出不同之处</td>
+</tr>
+<tr>
+<td>-H 或–speed-large-files</td>
+<td>比较大文件时，可加快速度</td>
+</tr>
+<tr>
+<td>-l 或–ignore-matching-lines</td>
+<td>若两个文件在某几行有所不同，而这几行同时都包含了选项中指定的字符或字符串，则不显示这两个文件的差异</td>
+</tr>
+<tr>
+<td>-i 或–ignore-case</td>
+<td>不检查大小写</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>若比较的文件为 C 语言的程序码文件时，显示差异所在的函数名称</td>
+</tr>
+<tr>
+<td>-q 或–brief</td>
+<td>仅显示有无差异，不显示详细的信息</td>
+</tr>
+<tr>
+<td>-r 或–recursive</td>
+<td>比较子目录中的文件</td>
+</tr>
+<tr>
+<td>-t 或–expand-tabs</td>
+<td>在输出时，将 tab 字符展开</td>
+</tr>
+<tr>
+<td>-T 或–initial-tab</td>
+<td>在每行前面加上 tab 字符以便对齐</td>
+</tr>
+<tr>
+<td>-u,-U 或–unified=</td>
+<td>以合并的方式来显示文件内容的不同</td>
+</tr>
+<tr>
+<td>-w 或–ignore-all-space</td>
+<td>忽略全部的空格字符</td>
+</tr>
+<tr>
+<td>-W 或–width</td>
+<td>在使用-y 参数时，指定栏宽</td>
+</tr>
+<tr>
+<td>-y 或–side-by-side</td>
+<td>以并列的方式显示文件的异同之处</td>
+</tr>
+<tr>
+<td>–left-column</td>
+<td>在使用-y 参数时，若两个文件某一行内容相同，则仅在左侧的栏位显示该行内容</td>
+</tr>
+<tr>
+<td>–suppress-common-lines</td>
+<td>在使用-y 参数时，仅显示不同之处</td>
+</tr>
+</tbody></table>
+<h2 id="范例-1：比较两个文件"><a href="#范例-1：比较两个文件" class="headerlink" title="范例 1：比较两个文件"></a>范例 1：比较两个文件</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">root@localhost</span> <span class="string">test3</span>]<span class="comment"># diff log2014.log log2013.log </span></span><br><span class="line"><span class="string">3c3</span></span><br><span class="line"><span class="string">&lt;</span> <span class="number">2014-03</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="string">&gt;</span> <span class="number">2013-03</span></span><br><span class="line"><span class="string">8c8</span></span><br><span class="line"><span class="string">&lt;</span> <span class="number">2013-07</span></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="string">&gt;</span> <span class="number">2013-08</span></span><br><span class="line"><span class="number">11</span><span class="string">,12d10</span></span><br><span class="line"><span class="string">&lt;</span> <span class="number">2013-11</span></span><br><span class="line"><span class="string">&lt;</span> <span class="number">2013-12</span></span><br></pre></td></tr></table></figure>
+
+<p><code>diff</code> 的 <code>normal</code> 显示格式有三种提示：</p>
+<ol>
+<li>a -add</li>
+<li>c - change</li>
+<li>d - delete</li>
+</ol>
+<p>上面的 <code>“3c3”</code> 和 <code>“8c8”</code> 表示 <code>log2014.log</code> 和 <code>log20143.log</code> 文件在 3 行和第 8 行内容有所不同；<code>&quot;11,12d10&quot;</code> 表示第一个文件比第二个文件多了第 11 和 12 行。</p>
+<h2 id="范例-2：并排格式输出"><a href="#范例-2：并排格式输出" class="headerlink" title="范例 2：并排格式输出"></a>范例 2：并排格式输出</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">root@localhost</span> <span class="string">test3</span>]<span class="comment"># diff log2014.log log2013.log  -y -W 50</span></span><br><span class="line"><span class="number">2013-01                 </span><span class="number">2013-01</span></span><br><span class="line"><span class="number">2013-02                 </span><span class="number">2013-02</span></span><br><span class="line"><span class="number">2014-03</span>               <span class="string">|</span> <span class="number">2013-03</span></span><br><span class="line"><span class="number">2013-04                 </span><span class="number">2013-04</span></span><br><span class="line"><span class="number">2013-05                 </span><span class="number">2013-05</span></span><br><span class="line"><span class="number">2013-06                 </span><span class="number">2013-06</span></span><br><span class="line"><span class="number">2013-07                 </span><span class="number">2013-07</span></span><br><span class="line"><span class="number">2013-07</span>               <span class="string">|</span> <span class="number">2013-08</span></span><br><span class="line"><span class="number">2013-09                 </span><span class="number">2013-09</span></span><br><span class="line"><span class="number">2013-10                 </span><span class="number">2013-10</span></span><br><span class="line"><span class="number">2013-11</span>               <span class="string">&lt;</span></span><br><span class="line"><span class="number">2013-12</span>               <span class="string">&lt;</span></span><br><span class="line">[<span class="string">root@localhost</span> <span class="string">test3</span>]<span class="comment"># diff log2013.log log2014.log  -y -W 50</span></span><br><span class="line"><span class="number">2013-01                 </span><span class="number">2013-01</span></span><br><span class="line"><span class="number">2013-02                 </span><span class="number">2013-02</span></span><br><span class="line"><span class="number">2013-03</span>               <span class="string">|</span> <span class="number">2014-03</span></span><br><span class="line"><span class="number">2013-04                 </span><span class="number">2013-04</span></span><br><span class="line"><span class="number">2013-05                 </span><span class="number">2013-05</span></span><br><span class="line"><span class="number">2013-06                 </span><span class="number">2013-06</span></span><br><span class="line"><span class="number">2013-07                 </span><span class="number">2013-07</span></span><br><span class="line"><span class="number">2013-08</span>               <span class="string">|</span> <span class="number">2013-07</span></span><br><span class="line"><span class="number">2013-09                 </span><span class="number">2013-09</span></span><br><span class="line"><span class="number">2013-10                 </span><span class="number">2013-10</span></span><br><span class="line">                      <span class="string">&gt;</span> <span class="number">2013-11</span></span><br><span class="line">                      <span class="string">&gt;</span> <span class="number">2013-12</span></span><br></pre></td></tr></table></figure>
+
+<p>“|”表示前后 2 个文件内容有不同</p>
+<p>“&lt;”表示后面文件比前面文件少了 1 行内容</p>
+<p>“&gt;”表示后面文件比前面文件多了 1 行内容</p>
+<h2 id="范例-3：上下文输出格式"><a href="#范例-3：上下文输出格式" class="headerlink" title="范例 3：上下文输出格式"></a>范例 3：上下文输出格式</h2><figure class="highlight diff"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost test3]# diff log2013.log log2014.log  -c</span><br><span class="line"><span class="comment">*** log2013.log 2012-12-07 16:36:26.000000000 +0800</span></span><br><span class="line"><span class="comment">--- log2014.log 2012-12-07 18:01:54.000000000 +0800</span></span><br><span class="line"><span class="comment">***************</span></span><br><span class="line"><span class="meta">*** 1,10 ****</span></span><br><span class="line">  2013-01</span><br><span class="line">  2013-02</span><br><span class="line"><span class="addition">! 2013-03</span></span><br><span class="line">  2013-04</span><br><span class="line">  2013-05</span><br><span class="line">  2013-06</span><br><span class="line">  2013-07</span><br><span class="line"><span class="addition">! 2013-08</span></span><br><span class="line">  2013-09</span><br><span class="line">  2013-10</span><br><span class="line"><span class="meta">--- 1,12 ----</span></span><br><span class="line">  2013-01</span><br><span class="line">  2013-02</span><br><span class="line"><span class="addition">! 2014-03</span></span><br><span class="line">  2013-04</span><br><span class="line">  2013-05</span><br><span class="line">  2013-06</span><br><span class="line">  2013-07</span><br><span class="line"><span class="addition">! 2013-07</span></span><br><span class="line">  2013-09</span><br><span class="line">  2013-10</span><br><span class="line"><span class="addition">+ 2013-11</span></span><br><span class="line"><span class="addition">+ 2013-12[root@localhost test3]# diff log2014.log log2013.log  -c</span></span><br><span class="line"><span class="comment">*** log2014.log 2012-12-07 18:01:54.000000000 +0800</span></span><br><span class="line"><span class="comment">--- log2013.log 2012-12-07 16:36:26.000000000 +0800</span></span><br><span class="line"><span class="comment">***************</span></span><br><span class="line"><span class="meta">*** 1,12 ****</span></span><br><span class="line">  2013-01</span><br><span class="line">  2013-02</span><br><span class="line"><span class="addition">! 2014-03</span></span><br><span class="line">  2013-04</span><br><span class="line">  2013-05</span><br><span class="line">  2013-06</span><br><span class="line">  2013-07</span><br><span class="line"><span class="addition">! 2013-07</span></span><br><span class="line">  2013-09</span><br><span class="line">  2013-10</span><br><span class="line"><span class="deletion">- 2013-11</span></span><br><span class="line"><span class="deletion">- 2013-12</span></span><br><span class="line"><span class="meta">--- 1,10 ----</span></span><br><span class="line">  2013-01</span><br><span class="line">  2013-02</span><br><span class="line"><span class="addition">! 2013-03</span></span><br><span class="line">  2013-04</span><br><span class="line">  2013-05</span><br><span class="line">  2013-06</span><br><span class="line">  2013-07</span><br><span class="line"><span class="addition">! 2013-08</span></span><br><span class="line">  2013-09</span><br><span class="line">  2013-10[root@localhost test3]#</span><br></pre></td></tr></table></figure>
+
+<p>这种方式在开头两行作了比较文件的说明，这里有三中特殊字符：</p>
+<p>“＋” 比较的文件的后者比前着多一行</p>
+<p>“－” 比较的文件的后者比前着少一行</p>
+<p>“！” 比较的文件两者有差别的行</p>
+<h2 id="范例-4：统一格式输出"><a href="#范例-4：统一格式输出" class="headerlink" title="范例 4：统一格式输出"></a>范例 4：统一格式输出</h2><figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost test3]# diff log2014.log log2013.log  -u</span><br><span class="line">--- log2014.log 2012<span class="string">-12</span><span class="string">-07</span> 18:01:54.000000000 <span class="string">+0800</span></span><br><span class="line">+++ log2013.log 2012<span class="string">-12</span><span class="string">-07</span> 16:36:26.000000000 <span class="string">+0800</span></span><br><span class="line">@@ <span class="string">-1</span>,12 <span class="string">+1</span>,10 @@</span><br><span class="line"> 2013<span class="string">-01</span></span><br><span class="line"> 2013<span class="string">-02</span></span><br><span class="line"><span class="string">-2014</span><span class="string">-03</span></span><br><span class="line"><span class="string">+2013</span><span class="string">-03</span></span><br><span class="line"> 2013<span class="string">-04</span></span><br><span class="line"> 2013<span class="string">-05</span></span><br><span class="line"> 2013<span class="string">-06</span></span><br><span class="line"> 2013<span class="string">-07</span></span><br><span class="line"><span class="string">-2013</span><span class="string">-07</span></span><br><span class="line"><span class="string">+2013</span><span class="string">-08</span></span><br><span class="line"> 2013<span class="string">-09</span></span><br><span class="line"> 2013<span class="string">-10</span></span><br><span class="line"><span class="string">-2013</span><span class="string">-11</span></span><br><span class="line"><span class="string">-2013</span><span class="string">-12</span></span><br></pre></td></tr></table></figure>
+
+<p>它的第一部分，也是文件的基本信息：</p>
+<p><code>--- log2014.log 2012-12-07 18:01:54.000000000 +0800</code></p>
+<p><code>+++ log2013.log 2012-12-07 16:36:26.000000000 +0800</code></p>
+<p>“—“表示变动前的文件，”+++”表示变动后的文件。</p>
+<p>第二部分，变动的位置用两个@作为起首和结束。</p>
+<p>　　 <code>@@ -1,12 +1,10 @@</code></p>
+<p>前面的 <code>&quot;-1,12&quot;</code> 分成三个部分：减号表示第一个文件（即 <code>log2014.log</code>），”1”表示第 1 行，”12”表示连续 12 行。合在一起，就表示下面是第一个文件从第 1 行开始的连续 12 行。同样的，<code>&quot;+1,10&quot;</code> 表示变动后，成为第二个文件从第 1 行开始的连续 10 行。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/diff/"># diff</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/22/macvlan%E8%99%9A%E6%8B%9F%E6%8A%80%E6%9C%AF%E7%9A%84bridge%E6%A8%A1%E5%BC%8F/">macvlan 虚拟技术的 bridge 模式</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/curl%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E7%AE%80%E4%BB%8B/">curl命令使用简介</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>c++ 学习之 static 关键字 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">c++ 学习之 static 关键字</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;11:00:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">编程语言</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="c-学习之-static-关键字"><a href="#c-学习之-static-关键字" class="headerlink" title="c++ 学习之 static 关键字"></a>c++ 学习之 static 关键字</h1><p>本文总结 c++ 中 static 关键的使用方式。</p>
+<p>我们可以使用 static 关键字修饰以下的数据：</p>
+<ol>
+<li>函数中的变量</li>
+<li>类中的变量</li>
+<li>类对象</li>
+<li>类中的函数</li>
+</ol>
+<h2 id="修饰函数中的变量"><a href="#修饰函数中的变量" class="headerlink" title="修饰函数中的变量"></a>修饰函数中的变量</h2><p>当对函数中的变量使用 static 关键字修饰时，该变量的生命周期将贯穿整个程序，即使多次调用该函数，静态变量的空间也只分配一次，前一次调用中的变量值将通过下一次函数调用传递。举例如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">demo</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//count为函数内的静态变量，内存只分配一次</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">    cout &lt;&lt; count &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    count++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">demo</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//程序输出:</span></span><br><span class="line"><span class="comment">//0 1 2 3 4</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="修饰类中的变量"><a href="#修饰类中的变量" class="headerlink" title="修饰类中的变量"></a>修饰类中的变量</h2><p>类中的变量若使用 static 关键字修饰，则此变量即为类的静态变量，静态变量是对象共享的，可以认为静态变量属于类，而不属于某一个对象。因此对于不同的对象，不能有相同的静态变量的多个副本。</p>
+<p>类的静态变量不能使用构造函数初始化。</p>
+<p>比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Apple</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> i;</span><br><span class="line">    <span class="built_in">Apple</span>() &#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Apple obj1;</span><br><span class="line">    Apple obj2;</span><br><span class="line">    <span class="comment">//error: i为类的静态变量，尝试创建多个副本将错误</span></span><br><span class="line">    obj1.i = <span class="number">2</span>;</span><br><span class="line">    obj2.i = <span class="number">3</span>;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的程序中，尝试为多个对象创建静态变量的多个副本，这样会导致编译器报错，编译时的错误信息为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[jamza@jamza-vm cpp]$ g11 7.cpp</span><br><span class="line">/tmp/cctsD3A3.o: In <span class="keyword">function</span> `main<span class="string">&#x27;:</span></span><br><span class="line"><span class="string">7.cpp:(.text+0x22): undefined reference to `Apple::i&#x27;</span></span><br><span class="line">7.cpp:(.text+0x2c): undefined reference to `Apple::i<span class="string">&#x27;</span></span><br><span class="line"><span class="string">collect2: error: ld returned 1 exit status</span></span><br><span class="line"><span class="string">[jamza@jamza-vm cpp]$</span></span><br></pre></td></tr></table></figure>
+
+<p>对于类中的静态变量，正确的做法，是使用类名和范围解析运算符，显式地初始化。因此，以上的程序，应该修改为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Apple</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> i;</span><br><span class="line">    <span class="built_in">Apple</span>() &#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> Apple::i = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Apple obj;</span><br><span class="line">    cout &lt;&lt; obj.i &lt;&lt; endl;</span><br><span class="line">  </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修饰类对象"><a href="#修饰类对象" class="headerlink" title="修饰类对象"></a>修饰类对象</h2><p>通过 static 关键字修饰类对象，使得类对象称为静态类对象，静态类对象的生命周期将贯穿整个程序。</p>
+<p>考虑如下的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span> </span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std; </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Apple</span> </span></span><br><span class="line"><span class="class">&#123;</span> </span><br><span class="line">    <span class="keyword">int</span> i; </span><br><span class="line">    <span class="keyword">public</span>: </span><br><span class="line">        <span class="built_in">Apple</span>() </span><br><span class="line">        &#123; </span><br><span class="line">            i = <span class="number">0</span>; </span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;Inside Constructor\n&quot;</span>; </span><br><span class="line">        &#125; </span><br><span class="line">        ~<span class="built_in">Apple</span>() </span><br><span class="line">        &#123; </span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;Inside Destructor\n&quot;</span>; </span><br><span class="line">        &#125; </span><br><span class="line">&#125;; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">0</span>; </span><br><span class="line">    <span class="keyword">if</span> (x==<span class="number">0</span>) </span><br><span class="line">    &#123; </span><br><span class="line">        Apple obj; </span><br><span class="line">    &#125; </span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;End of main\n&quot;</span>; </span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">//程序输出:</span></span><br><span class="line"><span class="comment">//Inside Constructor</span></span><br><span class="line"><span class="comment">//Inside Destructor</span></span><br><span class="line"><span class="comment">//End of main</span></span><br></pre></td></tr></table></figure>
+
+<p>在上面的程序中，对象在 if 块内声明为非静态。因此，变量的范围仅在 if 块内。因此，当创建对象时，将调用构造函数，并且在 if 块的控制权越过析构函数的同时调用，因为对象的范围仅在声明它的 if 块内。 如果我们将对象声明为静态，现在让我们看看输出的变化：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span> </span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std; </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Apple</span> </span></span><br><span class="line"><span class="class">&#123;</span> </span><br><span class="line">    <span class="keyword">int</span> i; </span><br><span class="line">    <span class="keyword">public</span>: </span><br><span class="line">        <span class="built_in">Apple</span>() </span><br><span class="line">        &#123; </span><br><span class="line">            i = <span class="number">0</span>; </span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;Inside Constructor\n&quot;</span>; </span><br><span class="line">        &#125; </span><br><span class="line">        ~<span class="built_in">Apple</span>() </span><br><span class="line">        &#123; </span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;Inside Destructor\n&quot;</span>; </span><br><span class="line">        &#125; </span><br><span class="line">&#125;; </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="keyword">int</span> x = <span class="number">0</span>; </span><br><span class="line">    <span class="keyword">if</span> (x==<span class="number">0</span>) </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="keyword">static</span> Apple obj; </span><br><span class="line">    &#125; </span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;End of main\n&quot;</span>; </span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">//程序输出:</span></span><br><span class="line"><span class="comment">//Inside Constructor</span></span><br><span class="line"><span class="comment">//End of main</span></span><br><span class="line"><span class="comment">//Inside Destructor</span></span><br></pre></td></tr></table></figure>
+
+<p>可以清楚地看到输出的变化。现在，在 main 结束后调用析构函数。这是因为静态对象的范围是贯穿程序的生命周期。</p>
+<h2 id="修饰类中的函数"><a href="#修饰类中的函数" class="headerlink" title="修饰类中的函数"></a>修饰类中的函数</h2><p>就像类中的静态数据成员或静态变量一样，静态成员函数也不依赖于类的对象。</p>
+<p>我们被允许使用对象和’.’来调用静态成员函数。但建议使用类名和范围解析运算符调用静态成员。</p>
+<p>允许静态成员函数仅访问静态数据成员或其他静态成员函数，它们无法访问类的非静态数据成员或成员函数。</p>
+<p>例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span> </span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std; </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Apple</span> </span></span><br><span class="line"><span class="class">&#123;</span> </span><br><span class="line">    <span class="keyword">public</span>: </span><br><span class="line">        <span class="comment">// static member function </span></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printMsg</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            cout&lt;&lt;<span class="string">&quot;Welcome to Apple!&quot;</span>; </span><br><span class="line">        &#125;</span><br><span class="line">&#125;; </span><br><span class="line"></span><br><span class="line"><span class="comment">// main function </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="comment">// invoking a static member function </span></span><br><span class="line">    Apple::<span class="built_in">printMsg</span>(); </span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">//程序输出:</span></span><br><span class="line"><span class="comment">//Welcome to Apple!</span></span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/c/"># c++</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/22/curl%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E7%AE%80%E4%BB%8B/">curl命令使用简介</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/const%E5%85%B3%E9%94%AE%E5%AD%97/">c++ 学习之 const 关键字</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

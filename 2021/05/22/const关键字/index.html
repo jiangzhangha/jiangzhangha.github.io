@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>c++ 学习之 const 关键字 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">c++ 学习之 const 关键字</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;10:59:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80/">编程语言</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="c-学习之-const-关键字"><a href="#c-学习之-const-关键字" class="headerlink" title="c++ 学习之 const 关键字"></a>c++ 学习之 const 关键字</h1><p>本文对 c++ 中的 const 关键字的使用方式进行总结。</p>
+<h2 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h2><p>关键字 const 是常量类型的修饰符，常量类型的变量或者对象的值是不能被修改更新的。</p>
+<h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><p>使用 const 关键字可以有以下的作用：</p>
+<ol>
+<li>可以定义常量；</li>
+<li>相比#define 定义的数据类型只是替换，const 类型数据可以借助编译器进行类型检查；</li>
+<li>防止变量或者对象被修改，增加程序的健壮性；</li>
+<li>可以节省内存空间，避免不必要的内存分配。</li>
+</ol>
+<h3 id="const-数据与宏定义的区别"><a href="#const-数据与宏定义的区别" class="headerlink" title="const 数据与宏定义的区别"></a>const 数据与宏定义的区别</h3><p>由 const 定义的常量，与#define 宏定义的常量，是有区别的。</p>
+<p>由 const 定义的常量，编译器可以对其常量类型是否符合类型定义进行检查，而#define 宏定义是没有数据类型的，在编译时，编译器只是执行简单的字符串替换，不能进行类型安全检查。</p>
+<p>const 定义的常量，从汇编角度看，只是给出了对应的内存地址，而不是像 define 宏定义给出的是立即数。因此，const 定义的常量在程序运行期间，只有一份拷贝，而 define 宏定义定义的常量在内存中存在多份拷贝。</p>
+<h3 id="const-对象默认为文件局部变量"><a href="#const-对象默认为文件局部变量" class="headerlink" title="const 对象默认为文件局部变量"></a>const 对象默认为文件局部变量</h3><p>对于未被 const 修饰的变量，默认为 extern，比如下例子：</p>
+<p>文件 1：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> ext;    <span class="comment">//未被const修饰，默认为extern</span></span><br></pre></td></tr></table></figure>
+
+<p>文件 2：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">int</span> ext;		<span class="comment">//通过extern，其实引用的是文件1中的变量</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout &lt;&lt; ext &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而被 const 修饰的变量，默认为文件局部变量，因此，要使得 const 变量能够被其他的 cpp 文件访问到，在定义 const 变量时，必须显式地指出该 const 变量为 extern。如下例子：</p>
+<p>文件 1：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//const变量若需要被其他文件访问到，需显式声明extern</span></span><br><span class="line"><span class="comment">//const变量在定义后就不能修改，因此需定义时就赋予初始值</span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">const</span> <span class="keyword">int</span> ext = <span class="number">12</span>;</span><br></pre></td></tr></table></figure>
+
+<p>文件 2：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">const</span> <span class="keyword">int</span> ext;		<span class="comment">//通过extern，其实引用的是文件1中的变量</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::cout &lt;&lt; ext &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>const 关键字可以应用的地方包括：</p>
+<ol>
+<li>定义常量</li>
+<li>定义指针或者指针指向的对象</li>
+<li>函数中使用 const</li>
+<li>类中使用 const</li>
+</ol>
+<h3 id="定义常量"><a href="#定义常量" class="headerlink" title="定义常量"></a>定义常量</h3><p>使用 const 定义常量时，需注意：</p>
+<ol>
+<li>定义完常量值后，不可更改</li>
+<li>常量在定义后就不能修改，因此，必须在定义时就初始化</li>
+</ol>
+<p>比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> num = <span class="number">10</span>;</span><br><span class="line">num = <span class="number">12</span>; <span class="comment">//error: const常量在定义后，就不能被修改</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> i,j = <span class="number">0</span>; <span class="comment">//error: const常量定义时就必须初始化，这里i未初始化</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="指针与-const"><a href="#指针与-const" class="headerlink" title="指针与 const"></a>指针与 const</h3><p>与 const 相关的指针，包括两种大类：</p>
+<ol>
+<li>指向 const 对象的指针，即 const 修饰指针所指向的对象，指针本身不是常量，可修改；</li>
+<li>执行对象的 const 指针，即 const 修饰的是指针本身，指针本身是常量，不可修改。</li>
+</ol>
+<p>对于如何区分 const 与指针的关系，总结为：</p>
+<ol>
+<li>如果 const 位于指针符号（*）的左侧，则 const 修饰的是指针所指的对象；</li>
+<li>如果 const 位于指针符号（*）的右侧，则 const 修饰的是指针本身，即指针为常量。</li>
+</ol>
+<p>比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> * a;  <span class="comment">//const修饰的是指针指向的对象，对象为常量，指针非常量</span></span><br><span class="line"><span class="keyword">char</span> <span class="keyword">const</span> * a;  <span class="comment">//同上</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> * <span class="keyword">const</span> a;  <span class="comment">//const修饰的是指针本身，即指针为常量</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> * <span class="keyword">const</span> a;  <span class="comment">//指向const对象的const指针，即指针与指向的对象均为常量</span></span><br></pre></td></tr></table></figure>
+
+<p>对于指向常量的指针，比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> * ptr;</span><br><span class="line">*ptr = <span class="number">10</span>;  <span class="comment">//error: 指针指向的对象为常量，不可通过指针修改对象</span></span><br></pre></td></tr></table></figure>
+
+<p>ptr 是一个指向 int 类型 const 对象的指针，const 修饰的是 int 类型的对象，即 ptr 所指向的对象，而不是 ptr 本身。因此，ptr 在定义时可以不初始化。不能通过 ptr 修改 int 类型对象，因为 int 类型对象被 const 修饰。</p>
+<p>另外需注意的点：</p>
+<ol>
+<li>不能使用 void * 指针保存 const 对象的地址，必须使用 const void * 类型的指针保存 const 对象的地址；</li>
+<li>允许将非 const 对象的地址，赋给指向 const 对象的指针，但是不能通过指针修改对象的值，必须通过其他方式修改。</li>
+</ol>
+<p>举例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> p = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">void</span> * vp = &amp;p;</span><br><span class="line"><span class="keyword">void</span> * vp = &amp;p;  <span class="comment">//error: 必须使用const void * 类型的指针保存const对象的地址</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> *ptr;</span><br><span class="line"><span class="keyword">int</span> val = <span class="number">3</span>;</span><br><span class="line">ptr = &amp;val;  <span class="comment">//ok: 允许将非const对象地址赋予指向const对象的指针</span></span><br><span class="line">*ptr = <span class="number">4</span>;  <span class="comment">//error: 不能通过ptr来修改val的值，即使val为非const对象</span></span><br></pre></td></tr></table></figure>
+
+<p>对于 const 修饰的指针，即常量指针，在定义时必须初始化，且后续常量指针不能被修改。比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> num = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> * <span class="keyword">const</span> ptr = #  <span class="comment">//ok: ptr为const指针，定义时必须被初始化</span></span><br><span class="line"><span class="keyword">int</span> b = <span class="number">2</span>;</span><br><span class="line">ptr = &amp;b;  <span class="comment">//error: ptr为const指针，不能被修改</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="函数中使用-const"><a href="#函数中使用-const" class="headerlink" title="函数中使用 const"></a>函数中使用 const</h3><p>在函数中使用 const 关键字，主要在两处：</p>
+<ol>
+<li>const 修饰函数的返回值</li>
+<li>const 修饰函数的参数</li>
+</ol>
+<p>对于 const 修饰函数的返回值，与 const 修饰普通变量与指针的含义相同，比如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">int</span> <span class="title">func</span><span class="params">()</span></span>;  <span class="comment">//合法，但是无意义</span></span><br><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">int</span> * <span class="title">func</span><span class="params">()</span></span>;  <span class="comment">//返回的指针指向的对象为常量</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> * <span class="keyword">const</span> <span class="title">func</span><span class="params">()</span></span>;  <span class="comment">//返回的指针为常量</span></span><br></pre></td></tr></table></figure>
+
+<p>对于 const 修饰函数的参数，一些例子为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//表示函数的形参var为常量，但是无意义，因为var为形参，在函数内不会改变</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">const</span> <span class="keyword">int</span> var)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//表示函数的入参指针ptr为常量，但是无意义</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> * <span class="keyword">const</span> ptr)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//表示函数的入参src指向的字符串不可变</span></span><br><span class="line"><span class="comment">//因此函数体内若试图修改src的内容，则编译器将报错</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">char</span> * dst, <span class="keyword">const</span> <span class="keyword">char</span> * src)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//效率较低，函数体内将产生A类型的临时对象复制参数a</span></span><br><span class="line"><span class="comment">//临时对象的构造，复制，析构等过程将消耗资源</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(A a)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//为了提高效率，引用传递，不会产生临时对象</span></span><br><span class="line"><span class="comment">//但是函数体内可通过引用改变a的值</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(A &amp; a)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//增加const修饰，此时依然是引用传递，但是函数体内无法修改a的值</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(<span class="keyword">const</span> A &amp;a)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="类中使用-const"><a href="#类中使用-const" class="headerlink" title="类中使用 const"></a>类中使用 const</h3><p>在设计类时，一个原则是，对于不改变数据成员的成员函数，都要在函数后面加上 const，而对于改变数据成员的成员函数则不加 const。</p>
+<p>类的成员函数后面加 const，表明这个函数不会对这个类对象的数据成员做任何的改变操作。所以，有 const 修饰的成员函数只能读取数据成员，不能改变数据成员，而没有 const 修饰的成员函数对数据成员是可读可写的。</p>
+<p>在一个类中，任何不会修改数据成员的函数，都应该声明为 const 类型。</p>
+<p>如果在编写 const 成员函数时，不慎修改了数据成员，或者调用了其他非 const 成员函数，编译器将报错。这样可以及时发现程序的错误，提高程序的健壮性。</p>
+<p>准确地说，成员函数中的 const，修饰的是指向对象的 this 指针。例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">func</span>(<span class="keyword">int</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>注意，这里的 func 函数其实具有两个参数，一个是 int 类型的入参，另一个是隐含的 <code>A * const this</code>。</p>
+<p>如果不想让函数 func 修改参数的值，可以将函数原型修改为 <code>func(const int)</code>。但是如果不运行函数修改 this 指针指向的对象呢？</p>
+<p>因为 this 指针是隐含的参数，无法使用 const 直接修饰 this，因此可以将 const 加在函数的后面，即 <code>func(int) const</code>，这样，this 指令就被修饰为 <code>const A * const this</code>。通过这样的修饰，函数 func 就无法修改类对象的成员数据了，如果试图修改，则编译器将会报错。</p>
+<p>下面是一个例子：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Student</span>(string str=<span class="literal">NULL</span>, <span class="keyword">double</span> sco=<span class="number">0.0</span>);</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">set_student</span><span class="params">(string str, <span class="keyword">double</span> sco)</span></span>;</span><br><span class="line">    <span class="function">string <span class="title">get_name</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">double</span> <span class="title">get_score</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    string name;</span><br><span class="line">    <span class="keyword">double</span> score;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//构造函数</span></span><br><span class="line">Student::<span class="built_in">Student</span>(string str, doubel sco)</span><br><span class="line">&#123;</span><br><span class="line">    name = str;</span><br><span class="line">    score = sco;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//修改成员数据，必须为非const</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Student::set_student</span><span class="params">(string str, doubel sco)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    name = str;</span><br><span class="line">    score = sco;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//不修改成员数据，可使用const修饰</span></span><br><span class="line"><span class="function">string <span class="title">Student::get_name</span><span class="params">()</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//不修改成员数据，可使用const修饰</span></span><br><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">Student::get_score</span><span class="params">()</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> score;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Student::display</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;调用非const: &quot;</span> &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;name: &quot;</span> &lt;&lt; name &lt;&lt; <span class="string">&quot;, score: &quot;</span> &lt;&lt; score &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//const成员函数可以重载非const成员函数</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Student::display</span><span class="params">()</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;调用const: &quot;</span> &lt;&lt; endl;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;name: &quot;</span> &lt;&lt; name &lt;&lt; <span class="string">&quot;, score: &quot;</span> &lt;&lt; score &lt;&lt; endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//外部函数</span></span><br><span class="line"><span class="comment">//如果对象非cons型，则不管get_name()与get_socre()函数是否为const成员函数，都可以调用</span></span><br><span class="line"><span class="comment">//如果对象为const型，则get_name()与get_socre()函数必须为const成员函数 </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">display</span><span class="params">(<span class="keyword">const</span> Student &amp;stu)</span>                 </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	cout&lt;&lt;<span class="string">&quot;外部函数:&quot;</span>&lt;&lt;endl;</span><br><span class="line">	cout&lt;&lt;<span class="string">&quot;name:&quot;</span>&lt;&lt;stu.<span class="built_in">get_name</span>()&lt;&lt;<span class="string">&quot;,score:&quot;</span>&lt;&lt;stu.<span class="built_in">get_score</span>()&lt;&lt;endl;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="function">Student <span class="title">stu1</span><span class="params">(<span class="string">&quot;lanzhihui&quot;</span>,<span class="number">89.1</span>)</span></span>;</span><br><span class="line">    <span class="comment">//如果存在非const型的成员函数，则调用非const型的成员函数</span></span><br><span class="line">    <span class="comment">//如果只存在const型的成员函数，则调用const型的成员函数</span></span><br><span class="line">	stu1.<span class="built_in">display</span>();</span><br><span class="line"> </span><br><span class="line">	stu1.<span class="built_in">set_student</span>(<span class="string">&quot;wangdan&quot;</span>,<span class="number">19.9</span>);</span><br><span class="line">	stu1.<span class="built_in">display</span>();</span><br><span class="line"> </span><br><span class="line">	<span class="function"><span class="keyword">const</span> Student <span class="title">stu2</span><span class="params">(<span class="string">&quot;wangqian&quot;</span>,<span class="number">19.3</span>)</span></span>;</span><br><span class="line">    <span class="comment">//必须调用const型的成员函数</span></span><br><span class="line">	stu2.<span class="built_in">display</span>();</span><br><span class="line"> </span><br><span class="line">	<span class="built_in">display</span>(stu1);</span><br><span class="line">	<span class="built_in">display</span>(stu2);</span><br><span class="line"> </span><br><span class="line">	<span class="built_in">system</span>(<span class="string">&quot;pause&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结：</p>
+<ol>
+<li>const 对象只能访问 const 成员函数，而非 const 对象可以访问任意的成员函数，包括 const 成员函数；</li>
+<li>const 对象的成员是不可修改的，但是 const 对象通过指针维护的成员却是可以修改的；</li>
+<li>const 成员函数不可以修改对象的成员数据，不管对象是否为 const；</li>
+<li>作为一个良好的编程风格，在声明成员函数时，若该成员函数并不对成员数据进行修改，则应该尽可能地将该成员函数使用 const 修饰；</li>
+<li>使用 mutable 修饰的成员数据，在任何情况下都可以被修改，此时 const 成员函数是可以修改 mutable 修饰的成员数据。</li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/c/"># c++</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/22/static%E5%85%B3%E9%94%AE%E5%AD%97/">c++ 学习之 static 关键字</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/%E8%BF%9C%E7%A8%8B%E5%8A%9E%E5%85%AC%E6%96%87%E5%8C%96%E6%80%9D%E8%80%83/">【转载】远程办公文化思考</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
