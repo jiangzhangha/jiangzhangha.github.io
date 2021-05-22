@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>持续集成的相关理念简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">持续集成的相关理念简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 21, 2021&nbsp;&nbsp;17:38:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/">软件工程</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="持续集成"><a href="#持续集成" class="headerlink" title="持续集成"></a>持续集成</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>持续集成（continuous integration，缩写 CI）是一种软件工程流程，是将所有的软件工程师对于软件工作副本持续集成到共享主线（mainline）的一种方法，该名称最早是由 Grady Booch 在其 Booch method 中提出的，在测试驱动开发（TDD）中，通常还会搭配自动单元测试。持续集成的提出，主要是为了解决软件进行系统集成时面临的各种难题。</p>
+<h2 id="解释"><a href="#解释" class="headerlink" title="解释"></a>解释</h2><p>持续集成的宗旨是避免集成问题，集成问题在极限编程（XP）方法学中被描述为集成地狱。在极限编程方法学中，持续集成需要达到最佳的效果，必须依靠自动化集成单元测试，并通过测试驱动开发（TDD）。首先必须设想在上线运作之前，已在开发环境完成并通过所有的单元测试。这将帮助避免一个开发者的作业流程，导致其他开发者作业的中断。如果有需要，可以在完整上线运作之前进用部分已完成的功能，例如使用功能切换。</p>
+<p>接着进行 CI 服务器建置概念的阐述、自动化运行单元测试的周期与每次测试需要提交给开发者的报告。建置 CI 服务器的用途(不一定要运行单元测试) 已经开始在极限编程(XP)社区之外的团队练习。如今，许多企业组织已经开始采用持续性集成，而非采用完整的极限编程(XP)。</p>
+<p>除了自动化单元测试，组织在运用持续性集成(CI)一般会建置 CI 服务器来维护持续性套用质量控制的程序-小部分的影响，并且经常性使用。除了运行单元与集成测试之外，还有额外的静态与动态测试，量测与描述性能，从程序来源码摘录与文件格式与促成手动质量保证(QA)程序。持续性质量控制应用程序用意在提升软件质量以及减少交付的时间，在完成所有开发后，取代传统软件上线质量控制机制。此非常相似进行频繁集成的最初概念让集成得以在 QA 程序上更容易地达成。</p>
+<p>同样的道理，持续性交付的最佳实践进一步扩展了持续性集成(CI)，以确保软件检核在主要程序上并且能够布署到用户以确保实际的布署流程可以非常快速。</p>
+<h2 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h2><p>当从事变更时，开发者会从目前基础代码库复制以进行作业，其他开发者提交代码的变更至来源代码库，并透过副本的方式取代来源代码库的代码。不只变更目前的代码库，新的代码也可以新增成为程序库、其它共享资源与潜在冲突。</p>
+<p>当分支代码保持在取出状态时间越长，当分支代码开发者进行主线重新集成时，就愈容易遭遇集成多重冲突的风险以及失败。当开发者将代码提交到代码库时，首先必须更新代码以反映他们在代码库中的更改，因为他们拿到了副本。代码库包含的更改越多，开发人员在提交自己的更改前必须运行的工作越多。</p>
+<p>终于，该程序库也许变成非常不同于开发者的目标代码，他们进入有时候被称为合并地狱或集成地狱的阶段，这时候开发者所花费的集成时间，将超过最初代码开发的时间。</p>
+<p>持续性集成涉及预先集成与预先与经常性的集成，借此来避免踩到集成地狱的陷阱，实践的目标是减少重工、减少成本与时间。</p>
+<p>持续性集成补充的实践是在提交成果之前，每个开发人员必须运行一个完整的构建与运行及通过所有的单元测试、集成测试，这些都是当持续性集成服务器侦测到代码有新的提交时，必须经常性与自动化的进行。</p>
+<h2 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h2><p>持续性集成–经常将新的或改变的代码与现有的代码库进行汇集，这作业应该频繁地发生，在提交和构建之间不存在中间窗口，并且没有错误可以在没有开发人员注意到并立即纠正的情况下产生。最佳的做法是透过每次提交一个程序库来触发建构，而不是定期预定的版本才进行建构。在快速提交的多开发者环境实践是这样的：在每次提交之后的短时间内触发，然后在时间到期后开始建构，或者在上次建构间隔一段时间之后。许多自动化工具都有提供相关的自动化调度。</p>
+<p>另一个要因是建构一个支持原子提交的版本控制系统，此系统可以让开发人员的每次变更都可成为单一提交操作，但如试图从只有改变一半的文件进行构建没有意义。</p>
+<p>为了实现上述目标，持续集成必须依靠以下原则：</p>
+<h3 id="维护一个代码库"><a href="#维护一个代码库" class="headerlink" title="维护一个代码库"></a>维护一个代码库</h3><p>这种做法意味着使用项目来源代码版本控制系统。所有项目相关的代码都需要存储在该代码库中，在这种做法的控制界中，依惯例该系统应该可以从新取出的进行构建并且不需要额外的作业。提倡极限编程法的马丁·福勒也主张，必须有简单的工具来支持程序开发的分支作业。相反的，最好将所有变更集成起来而不是同时维护多个版本的软件。简单的说，这是将软件开发工作版本化的地方。</p>
+<h3 id="自动构建"><a href="#自动构建" class="headerlink" title="自动构建"></a>自动构建</h3><p>透过一个单一指令来达成系统建构。许多的建构工具软件如 MAKE 已存在许多年，其他较新的工具程序都频繁的使用在持续性集成环境。建构的自动化应该包含自动化作业与集成作业，并且通常包含正式环境的布署。在许多案例中，代码的建构不仅仅只是编译二进制元，通常总是伴随的文件的产生、网站的建构、状态数据与布署的封装媒体。(如 Debian 的 DEB、Red Hat 的 RPM 与微软的 MSI 文件)</p>
+<h3 id="让构建时自动测试"><a href="#让构建时自动测试" class="headerlink" title="让构建时自动测试"></a>让构建时自动测试</h3><p>一旦代码编辑好，下一个阶段应该要进行所有的测试，以确保软件开发的成果符合预期。</p>
+<h3 id="每人每天都应提交"><a href="#每人每天都应提交" class="headerlink" title="每人每天都应提交"></a>每人每天都应提交</h3><p>透过定期的承诺，每个提交者都能够减少变更冲突的数量。一次检查一个星期的工作成果时，遭遇到集成冲突的风险相对交高，这时排解的困难性也相对升高。早期性系统的局部冲突，将可以让系统团队及时因应与进行调整建构的方向。</p>
+<p>一天至少提交一次(每个功能构建一次)通常被定义为持续集成的一部分。此外，建议每晚在提交之后立即进行建构，以上都是下限值，实际上的频率往往要高出许多。</p>
+<h3 id="每份提交都应进行构建"><a href="#每份提交都应进行构建" class="headerlink" title="每份提交都应进行构建"></a>每份提交都应进行构建</h3><p>系统应该要在每次提交之后，针对当下的版本进行建构以确认程序可正确的集成。通常实务上会使用自动化进行持续集成，也许这个也可以手动进行。在许多时候，持续集成是使用自动化持续集成的代名词，透过持续集成服务器或应用程序监控版本控制系统的变化，然后自动进行建构的过程。</p>
+<h3 id="维持快速构建"><a href="#维持快速构建" class="headerlink" title="维持快速构建"></a>维持快速构建</h3><p>每个建置必须要维持快速完成，如此一来便可以避免集成问题。</p>
+<h3 id="用正式环境的副本进行测试"><a href="#用正式环境的副本进行测试" class="headerlink" title="用正式环境的副本进行测试"></a>用正式环境的副本进行测试</h3><p>拥有一个测试环境并不能保证一切顺利，也会在布署上线时产生错误，因为测试环境和正式环境或许存在很大的差距。然而，如果要建置一份与在线环境一模一样的测试环境，还需要成本考量。相反的，测试环境或是独立的预备环境应该要建置实际正式环境的扩展版本，以在可容许的成本内同时达到维护堆栈结构技术与细微化。在那些测试环境中，服务虚拟化是通常运来获得，随需求访问超出团队控制的依赖关系(如 API、第三方应用程序、第三方服务与大型主机系统)、持续演变或者因太复杂无法在虚拟实验室中还原的情境。</p>
+<h3 id="让获取最新版本更容易"><a href="#让获取最新版本更容易" class="headerlink" title="让获取最新版本更容易"></a>让获取最新版本更容易</h3><p>使建置容易让利益关系人与测试者使用，能够减少许多因为建置的成果不合乎需求的重工状况。此外，提早测是能够在提早程序布署前知道变更的缺陷。在某些情况下，也可以提前查出错误，从而减少解决问题所需的工作量。所有程序员都应该从存储库更新项目来开始新的一天。这样，他们将可保持该程序存储库的最新状态。</p>
+<h3 id="任何人都可以查看最终构建结果"><a href="#任何人都可以查看最终构建结果" class="headerlink" title="任何人都可以查看最终构建结果"></a>任何人都可以查看最终构建结果</h3><p>系统应该要让任何人都可以容易查找出建构是否中断，并且可以显示何人正在变更相关程序。</p>
+<h3 id="自动部署"><a href="#自动部署" class="headerlink" title="自动部署"></a>自动部署</h3><p>大部分的持续集成系统允许在建置完成后自动运行代码。因此能够写一段代码来布署应用程序至任何人都可以观察的测试服务器。在持续性集成未来的思考发展成像持续性布署迈进。持续性布署将要求直接将软件布署至测试环境中，这通常需要额外的自动化机制来防止程序缺陷。</p>
+<h2 id="效益"><a href="#效益" class="headerlink" title="效益"></a>效益</h2><p>持续集成目的在产生以下效益：</p>
+<ol>
+<li>及早发现集成错误，且由于修订的内容较小所以易于追踪，这可以节省项目的时间与成本</li>
+<li>避免发布日期的前一分钟发生混乱，当每个人都会尝试为他们所造成的那一点点不兼容的版本做检查</li>
+<li>当单元测试失败或发生错误，若开发人员需要在不调试的情况下还原代码库到一个没有问题的状态，只需要放弃一小部分的更改 (因为集成的次数频繁)</li>
+<li>让 “最新” 的程序可保持可用的状态供测试、展示或发布用</li>
+<li>频繁的提交代码会促使开发人员创建模块化，低复杂性的代码</li>
+</ol>
+<p>持续性自动化测试的效益：</p>
+<ol>
+<li>强制运行频繁的自动化测试纪律</li>
+<li>当改变对全系统造成影响时立即反馈</li>
+<li>自动化测试和持续性集成产生的软件度量(如代码覆盖度量，代码复杂度和功能完整性等)标准将开发人员集中在开发功能性，高质量的代码上，并帮助开发团队发展</li>
+</ol>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><ol>
+<li>构建一个自动化测试包需要大量的工作，包括不断努力以覆盖新功能，并依照特定情境进行代码修改</li>
+<li>构建系统需要一些工作，而且可能变得复杂，难以灵活修改</li>
+<li>如果范围很小或包含无法测试的旧版代码，持续性集成不一定有价值</li>
+<li>增加的价值取决于测试的质量以及代码的真实可测性</li>
+<li>较大的团队意味着不断将代码添加到集成队列中，因此追踪交付（同时保持质量）很困难，而排队可能会减慢所有人的进度</li>
+<li>通过一天的多次提交和合并，功能的部分代码可以轻松推送，如此一来集成测试将会失败直到整个功能开发完成</li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/"># 软件工程</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/21/%E3%80%902%E3%80%91inotify+rsync/">【转载】rsync简介：inotify + rsync</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
