@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>浅析Linux下进程的调度策略与优先级 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">浅析Linux下进程的调度策略与优先级</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;8:45:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/">技术杂文</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="线程调度"><a href="#线程调度" class="headerlink" title="线程调度"></a>线程调度</h2><p>在 Linux 中，线程是由进程来实现的，可以认为线程就是一个轻量级的进程，因此，线程调度是按照进程调度的方式来进行的。这样设计，线程调度流程可以直接复用进程调度流程，没必要再设计一个进程内的线程调度器了。</p>
+<h2 id="调度策略与调度优先级"><a href="#调度策略与调度优先级" class="headerlink" title="调度策略与调度优先级"></a>调度策略与调度优先级</h2><p>在 Linux 中，进程调度器是基于进程的调度策略与调度优先级来决定调度哪个进程运行。</p>
+<p>调度策略主要包括：</p>
+<ul>
+<li>SCHED_OTHER</li>
+<li>SCHED_IDLE</li>
+<li>SCHED_BACH</li>
+<li>SCHED_FIFO</li>
+<li>SCHED_RR</li>
+</ul>
+<p>调度优先级的范围是 0~99，数值越大，表示优先级越高。</p>
+<p>其中，SCHED_OTHER、SCHED_IDLE、SCHED_BACH 为非实时调度策略，其调度优先级为 0。而 SCHED_FIFO、SCHED_RR 是实时调度策略，其调度优先级范围为 1~99。</p>
+<p>实时调度策略的进程总是比非实时调度策略的进程优先级高。</p>
+<p>在 Linux 内部实现中，调度器会为每个可能的调度优先级维护一个可运行的进程列表，以最高优先级列表头部的进程作为下一次调度的进程，所有的调度都是抢占式的，如果一个具有更高调度优先级的进程转换为可运行状态，那么当前运行的进程将被强制进入其等待的队列中。</p>
+<h3 id="常见的调度策略"><a href="#常见的调度策略" class="headerlink" title="常见的调度策略"></a>常见的调度策略</h3><p><strong>SCHED_OTHER</strong></p>
+<p>该调度策略是默认的 Linux 分时调度策略，该调度策略为非实时的，其调度优先级总是为 0。</p>
+<p>对于该调度策略类型的进程，调度器是基于动态优先级来调度的。动态优先级跟属性 nice 有关，nice 的值会随着进程的运行时间而动态改变，以确保所有具有 SCHED_OTHER 策略的进程公平地得到调度。</p>
+<p>在 Linux 中，nice 的值范围为-20 ~ +19，默认值为 0。nice 值越大，则优先级越低，因此相对较低 nice 值的进程可以获得更多的处理器时间。</p>
+<p>通过命令 <code>ps -el</code> 查看系统中的进程列表，其中 <code>NI</code> 列就是进程对应的 nice 值。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# ps -el</span><br><span class="line">F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD</span><br><span class="line">4 S     0     1     0  0  80   0 - 13653 ep_pol ?        00:00:40 systemd</span><br><span class="line">1 S     0     2     0  0  80   0 -     0 kthrea ?        00:00:00 kthreadd</span><br><span class="line">1 S     0     3     2  0  80   0 -     0 smpboo ?        00:00:05 ksoftirqd/0</span><br><span class="line">1 S     0     7     2  0 -40   - -     0 smpboo ?        00:00:00 migration/0</span><br><span class="line">1 S     0     8     2  0  80   0 -     0 rcu_gp ?        00:00:00 rcu_bh</span><br><span class="line">1 S     0     9     2  0  80   0 -     0 rcu_gp ?        00:00:21 rcu_sched</span><br><span class="line">5 S     0    10     2  0  60 -20 -     0 rescue ?        00:00:00 lru-add-drain</span><br><span class="line">5 S     0    11     2  0 -40   - -     0 smpboo ?        00:00:01 watchdog/0</span><br><span class="line">5 S     0    13     2  0  80   0 -     0 devtmp ?        00:00:00 kdevtmpfs</span><br><span class="line">5 S     0    14     2  0  60 -20 -     0 rescue ?        00:00:00 netns</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>使用 <code>top</code> 命令，看到的 <code>NI</code> 列也是进程的 nice 值。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# top</span><br><span class="line">top - 14:23:38 up 8 days,  5:44,  5 users,  load average: 3.73, 2.67, 2.00</span><br><span class="line">Tasks: 136 total,   3 running, 132 sleeping,   1 stopped,   0 zombie</span><br><span class="line"><span class="meta">%</span><span class="bash">Cpu(s): 29.4 us, 29.4 sy,  0.0 ni, 41.2 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st, 38.0 id_exact,  1.2 hi_exact,  1.7 irq_exac</span></span><br><span class="line"></span><br><span class="line">KiB Mem :   991516 total,   434932 free,   408604 used,   147980 buff/cache</span><br><span class="line">KiB Swap:   524284 total,   158632 free,   365652 used.   461432 avail Mem</span><br><span class="line"></span><br><span class="line">  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND</span><br><span class="line">22067 root      20   0    7312     28      0 R 25.0  0.0  70:38.00 stress</span><br><span class="line">22068 root      20   0  621716 215216     28 R 25.0 21.7  70:34.70 stress</span><br><span class="line">    1 root      20   0   54612   3452   2108 S  0.0  0.3   0:40.82 systemd</span><br><span class="line">    2 root      20   0       0      0      0 S  0.0  0.0   0:00.17 kthreadd</span><br><span class="line">    3 root      20   0       0      0      0 S  0.0  0.0   0:05.92 ksoftirqd/0</span><br><span class="line">    7 root      rt   0       0      0      0 S  0.0  0.0   0:00.00 migration/0</span><br><span class="line">    8 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcu_bh</span><br><span class="line">    9 root      20   0       0      0      0 S  0.0  0.0   0:21.27 rcu_sched</span><br><span class="line">   10 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 lru-add-drain</span><br><span class="line">   11 root      rt   0       0      0      0 S  0.0  0.0   0:01.39 watchdog/0</span><br><span class="line">   13 root      20   0       0      0      0 S  0.0  0.0   0:00.00 kdevtmpfs</span><br><span class="line">   14 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 netns</span><br><span class="line">   15 root      20   0       0      0      0 S  0.0  0.0   0:00.14 khungtaskd</span><br><span class="line">   16 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 writeback</span><br><span class="line">   17 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 kintegrityd</span><br><span class="line">   18 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 bioset</span><br><span class="line">   19 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 kblockd</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>调整 nice 值，可以通过 shell 命令 <code>nice</code>，该命令可以按照指定的 nice 值运行 <code>cmd</code>，命令的帮助信息为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# nice --help</span><br><span class="line">Usage: nice [OPTION] [COMMAND [ARG]...]</span><br><span class="line">Run COMMAND with an adjusted niceness, which affects process scheduling.</span><br><span class="line">With no COMMAND, print the current niceness.  Niceness values range from</span><br><span class="line">-20 (most favorable to the process) to 19 (least favorable to the process).</span><br><span class="line"></span><br><span class="line">Mandatory arguments to long options are mandatory for short options too.</span><br><span class="line">  -n, --adjustment=N   add integer N to the niceness (default 10)</span><br><span class="line">      --help     display this help and exit</span><br><span class="line">      --version  output version information and exit</span><br><span class="line"></span><br><span class="line">NOTE: your shell may have its own version of nice, which usually supersedes</span><br><span class="line">the version described here.  Please refer to your shell&#x27;s documentation</span><br><span class="line">for details about the options it supports.</span><br><span class="line"></span><br><span class="line">GNU coreutils online help: &lt;http://www.gnu.org/software/coreutils/&gt;</span><br><span class="line">For complete documentation, run: info coreutils &#x27;nice invocation&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>重新调整已运行进程的 nice 值，可通过 <code>renice</code> 命令实现，命令的帮助信息为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# renice --help</span><br><span class="line"></span><br><span class="line">Usage:</span><br><span class="line"> renice [-n] &lt;priority&gt; [-p|--pid] &lt;pid&gt;...</span><br><span class="line"> renice [-n] &lt;priority&gt;  -g|--pgrp &lt;pgid&gt;...</span><br><span class="line"> renice [-n] &lt;priority&gt;  -u|--user &lt;user&gt;...</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line"> -g, --pgrp &lt;id&gt;        interpret argument as process group ID</span><br><span class="line"> -n, --priority &lt;num&gt;   specify the nice increment value</span><br><span class="line"> -p, --pid &lt;id&gt;         interpret argument as process ID (default)</span><br><span class="line"> -u, --user &lt;name|id&gt;   interpret argument as username or user ID</span><br><span class="line"> -h, --help             display help text and exit</span><br><span class="line"> -V, --version          display version information and exit</span><br><span class="line"></span><br><span class="line">For more information see renice(1).</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>另外，可以执行 <code>top</code> 命令，输入 <code>r</code>，根据提示输入进程的 <code>pid</code>，再输入 <code>nice</code> 数值，也可以调整进程的 <code>nice</code> 值。</p>
+<p><strong>SCHED_FIFO</strong></p>
+<p>该调度策略为先入先出调度策略，简单概括，就是一旦进程占用了 CPU，则一直运行，直到有更高优先级的任务抢占，或者进程自己放弃占用 CPU。</p>
+<p><strong>SCHED_RR</strong></p>
+<p>该调度策略为时间片轮转调度策略，该调度策略是基于 SCHED_FIFO 策略的演进，其在每个进程上增加一个时间片限制，当时间片使用完成后，调度器将该进程置于队列的尾端，放在尾端保证了所有具有相同调度优先级的进程的调度公平。</p>
+<p>使用 <code>top</code> 命令，如果 <code>PR</code> 列的值为 <code>RT</code>，则说明该进程采用的是实时调度策略，其调度策略为 SCHED_FIFO 或者 SCHED_RR，而对于非实时调度策略的进程，该列的值为 <code>NI + 20</code>。</p>
+<p>可以通过命令 <code>ps -eo state,uid,pid,ppid,rtprio,time,comm</code> 来查看进程对应的实时优先级，实时优先级位于 <code>RTPRIO</code> 列下，如果进程对应的列显示为 <code>-</code>，说明该进程不是实时进程。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# ps -eo state,uid,pid,ppid,rtprio,time,comm</span><br><span class="line">S   UID   PID  PPID RTPRIO     TIME COMMAND</span><br><span class="line">S     0     1     0      - 00:00:40 systemd</span><br><span class="line">S     0     2     0      - 00:00:00 kthreadd</span><br><span class="line">S     0     3     2      - 00:00:05 ksoftirqd/0</span><br><span class="line">S     0     7     2     99 00:00:00 migration/0</span><br><span class="line">S     0     8     2      - 00:00:00 rcu_bh</span><br><span class="line">S     0     9     2      - 00:00:21 rcu_sched</span><br><span class="line">S     0    10     2      - 00:00:00 lru-add-drain</span><br><span class="line">S     0    11     2     99 00:00:01 watchdog/0</span><br><span class="line">S     0    13     2      - 00:00:00 kdevtmpfs</span><br><span class="line">S     0    14     2      - 00:00:00 netns</span><br><span class="line">S     0    15     2      - 00:00:00 khungtaskd</span><br><span class="line">S     0    16     2      - 00:00:00 writeback</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="chrt-命令"><a href="#chrt-命令" class="headerlink" title="chrt 命令"></a>chrt 命令</h2><p><code>chrt</code> 命令可以用来很简单地更改进程的调度策略与调度优先级。在 Linux 下查看 <code>chrt</code> 命令的帮助信息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# chrt --help</span><br><span class="line">Show or change the real-time scheduling attributes of a process.</span><br><span class="line"></span><br><span class="line">Set policy:</span><br><span class="line"> chrt [options] &lt;priority&gt; &lt;command&gt; [&lt;arg&gt;...]</span><br><span class="line"> chrt [options] --pid &lt;priority&gt; &lt;pid&gt;</span><br><span class="line"></span><br><span class="line">Get policy:</span><br><span class="line"> chrt [options] -p &lt;pid&gt;</span><br><span class="line"></span><br><span class="line">Policy options:</span><br><span class="line"> -b, --batch          set policy to SCHED_BATCH</span><br><span class="line"> -d, --deadline       set policy to SCHED_DEADLINE</span><br><span class="line"> -f, --fifo           set policy to SCHED_FIFO</span><br><span class="line"> -i, --idle           set policy to SCHED_IDLE</span><br><span class="line"> -o, --other          set policy to SCHED_OTHER</span><br><span class="line"> -r, --rr             set policy to SCHED_RR (default)</span><br><span class="line"></span><br><span class="line">Scheduling options:</span><br><span class="line"> -R, --reset-on-fork       set SCHED_RESET_ON_FORK for FIFO or RR</span><br><span class="line"> -T, --sched-runtime &lt;ns&gt;  runtime parameter for DEADLINE</span><br><span class="line"> -P, --sched-period &lt;ns&gt;   period parameter for DEADLINE</span><br><span class="line"> -D, --sched-deadline &lt;ns&gt; deadline parameter for DEADLINE</span><br><span class="line"></span><br><span class="line">Other options:</span><br><span class="line"> -a, --all-tasks      operate on all the tasks (threads) for a given pid</span><br><span class="line"> -m, --max            show min and max valid priorities</span><br><span class="line"> -p, --pid            operate on existing given pid</span><br><span class="line"> -v, --verbose        display status information</span><br><span class="line"></span><br><span class="line"> -h, --help     display this help and exit</span><br><span class="line"> -V, --version  output version information and exit</span><br><span class="line"></span><br><span class="line">For more details see chrt(1).</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>比如，获取某个进程的调度策略，使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# chrt -p 27916</span><br><span class="line">pid 27916&#x27;s current scheduling policy: SCHED_FIFO</span><br><span class="line">pid 27916&#x27;s current scheduling priority: 80</span><br></pre></td></tr></table></figure>
+
+<p>在比如，设置某个进程的调度策略为 SCHED_FIFO，调度优先级为 70，使用如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu1_docker ~]# chrt -p -f 70 27917</span><br><span class="line">[root@vm_rp0_cpu1_docker ~]#</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sched.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">get_thread_policy</span><span class="params">(<span class="keyword">pthread_attr_t</span> *attr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> policy;</span><br><span class="line">    <span class="keyword">int</span> rs = pthread_attr_getschedpolicy(attr,&amp;policy);</span><br><span class="line">    assert(rs==<span class="number">0</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">switch</span>(policy)</span><br><span class="line">    &#123;   </span><br><span class="line">        <span class="keyword">case</span> SCHED_FIFO:</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;policy=SCHED_FIFO\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">case</span> SCHED_RR:</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;policy=SCHED_RR\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">case</span> SCHED_OTHER:</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;policy=SCHED_OTHER\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;policy=UNKNOWN\n&quot;</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;   </span><br><span class="line">    <span class="keyword">return</span> policy;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">show_thread_priority</span><span class="params">(<span class="keyword">pthread_attr_t</span> *attr,<span class="keyword">int</span> policy)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> priority = sched_get_priority_max(policy);</span><br><span class="line">    assert(priority != <span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;max_priority=%d\n&quot;</span>,priority);</span><br><span class="line"> </span><br><span class="line">    priority= sched_get_priority_min(policy);</span><br><span class="line">    assert(priority != <span class="number">-1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;min_priority=%d\n&quot;</span>,priority);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">get_thread_priority</span><span class="params">(<span class="keyword">pthread_attr_t</span> *attr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sched_param</span> <span class="title">param</span>;</span></span><br><span class="line">    <span class="keyword">int</span> rs = pthread_attr_getschedparam(attr,¶m);</span><br><span class="line">    assert(rs == <span class="number">0</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;priority=%d\n&quot;</span>,param.__sched_priority);</span><br><span class="line">    <span class="keyword">return</span> param.__sched_priority;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">set_thread_policy</span><span class="params">(<span class="keyword">pthread_attr_t</span> *attr,<span class="keyword">int</span> policy)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> rs = pthread_attr_setschedpolicy(attr,policy);</span><br><span class="line">    assert(rs==<span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">pthread_attr_t</span> attr;</span><br><span class="line">    <span class="keyword">int</span> rs;</span><br><span class="line"> </span><br><span class="line">    rs = pthread_attr_init(&amp;attr);</span><br><span class="line">    assert(rs==<span class="number">0</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">int</span> policy = get_thread_policy(&amp;attr);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Show current configuration of priority\n&quot;</span>);</span><br><span class="line">    get_thread_policy(&amp;attr);</span><br><span class="line">    show_thread_priority(&amp;attr,policy);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;show SCHED_FIFO of priority\n&quot;</span>);</span><br><span class="line">    show_thread_priority(&amp;attr,SCHED_FIFO);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;show SCHED_RR of priority\n&quot;</span>);</span><br><span class="line">    show_thread_priority(&amp;attr,SCHED_RR);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;show priority of current thread\n&quot;</span>);</span><br><span class="line">    get_thread_priority(&amp;attr);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Set thread policy\n&quot;</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;set SCHED_FIFO policy\n&quot;</span>);</span><br><span class="line">    set_thread_policy(&amp;attr,SCHED_FIFO);</span><br><span class="line">    get_thread_policy(&amp;attr);</span><br><span class="line">    get_thread_priority(&amp;attr);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;set SCHED_RR policy\n&quot;</span>);</span><br><span class="line">    set_thread_policy(&amp;attr,SCHED_RR);</span><br><span class="line">    get_thread_policy(&amp;attr);</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Restore current policy\n&quot;</span>);</span><br><span class="line">    set_thread_policy(&amp;attr,policy);</span><br><span class="line">    get_thread_priority(&amp;attr);</span><br><span class="line"> </span><br><span class="line">    rs = pthread_attr_destroy(&amp;attr);</span><br><span class="line">    assert(rs==<span class="number">0</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/"># 技术杂文</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2021/05/22/%E4%B8%BA%E4%BB%80%E4%B9%88size_t%E9%87%8D%E8%A6%81/">为什么 size_t 重要？</a>
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/iovec%E7%BB%93%E6%9E%84%E4%BD%93%E5%AE%9A%E4%B9%89%E4%B8%8E%E4%BD%BF%E7%94%A8/">iovec结构体的定义与使用</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

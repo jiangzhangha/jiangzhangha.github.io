@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>为什么 size_t 重要？ | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">为什么 size_t 重要？</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;8:56:06</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/">技术杂文</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="为什么-size-t-重要？"><a href="#为什么-size-t-重要？" class="headerlink" title="为什么 size_t 重要？"></a>为什么 size_t 重要？</h1><blockquote>
+<p>本文摘录自：<a target="_blank" rel="noopener" href="https://jeremybai.github.io/blog/2014/09/10/size-t">https://jeremybai.github.io/blog/2014/09/10/size-t</a></p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>使用 size_t 可能会提高代码的可移植性，有效性，或者可读性。</p>
+<p>在标准 C 库中，许多函数使用的参数，或者返回值都是用字节大小表示的对象大小，比如 malloc(n)函数的参数 n 表示需要申请的内存空间的字节大小，再比如 memcpy(s1, s2, n)，函数的最后一个参数 n 表示需要复制的内存的大小。</p>
+<p>或许你认为这些参数或者返回值应该被声明为 int 类型，或者 long 类型，但是事实上，在 C 标准中将其定义为 size_t 类型，比如下列的函数声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">malloc</span><span class="params">(<span class="keyword">size_t</span> n)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">memcpy</span><span class="params">(<span class="keyword">void</span> *s1, <span class="keyword">void</span> <span class="keyword">const</span> *s2, <span class="keyword">size_t</span> n)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">size_t</span> <span class="title">strlen</span><span class="params">(<span class="keyword">char</span> <span class="keyword">const</span> *s)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>类似 size_t 还出现在 C++ 标准库中，此外 C++ 标准库中还经常使用一个类似的类型 size_type。</p>
+<h2 id="可移植性问题"><a href="#可移植性问题" class="headerlink" title="可移植性问题"></a>可移植性问题</h2><p>在早期的 C 语言中并没有提供 size_t 类型，C 标准委员会为了解决移植性问题，将 size_t 引入到 C 语言中。</p>
+<p>比如，让我们写一个可移植的 memcpy 函数，将会看到一些不同的声明和它们在不同的平台下的编译情况。</p>
+<p>对于 memcpy(s1, s2, n)函数，其将 s2 指向的地址开始的 n 个字节拷贝到 s1 指向的地址，返回 s1，这个函数可以拷贝任意类型的数据，所以参数与返回值类型为 void *类型。对于第三个参数 n，代表了源对象的大小，若将其类型写为 int，即：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">memcpy</span><span class="params">(<span class="keyword">void</span> *s1, <span class="keyword">void</span> <span class="keyword">const</span> *s2, <span class="keyword">int</span> n)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>使用 int 类型在大部分情况下都是可以的，但是并不是所有情况下都可以。int 是有符号的，它可以表示负数，但是，大小不可能是复数。所以我们可以使用 unsigned int 代替它让第三个参数表示的范围更大。</p>
+<p>在大部分机器上，unsigned int 的最大值要比 int 的最大值大两倍，比如说再也给 16 位的机器上，unsigned int 的最大值为 65535，int 的最大值为 32767。</p>
+<p>尽管 int 类型的大小依赖于 C 编译器的实现，但是在给定的平台上 int 对象的大小和 unsigned int 对象的大小是一样的。因此，使用 unsigned int 修饰第三个参数的代价与 int 是相同的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">memcpy</span><span class="params">(<span class="keyword">void</span> *s1, <span class="keyword">void</span> <span class="keyword">const</span> *s2, <span class="keyword">unsigned</span> <span class="keyword">int</span> n)</span></span>; </span><br></pre></td></tr></table></figure>
+
+<p>这样似乎没有问题了，unsigned int 可以表示最大类型的对象大小了，这种情况只有在整形和指针类型具有相同大小的情况下，比如说在 IP16 中，整形和指针都占 2 个字节（16 位），而在 IP32 上面，整形和指针都占 4 个字节（32 位）。</p>
+<p>不幸的是，这种 memcpy 的申明在 I16LP32 架构上（整形是 16-bit 长整形和指针类型时 32-bits）显得不够用了，比如说摩托罗拉第一代处理器 68000，在这种情况下，处理器可能拷贝的数据大于 65535 个字节，但是这个函数第三个参数 n 不能处理这么大的数据。</p>
+<p>什么？你说很容易就可以改正？只需要把 memcpy 的第三个参数的类型修改一下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">memcpy</span><span class="params">(<span class="keyword">void</span> *s1, <span class="keyword">void</span> <span class="keyword">const</span> *s2, <span class="keyword">unsigned</span> <span class="keyword">long</span>  n)</span></span>; </span><br></pre></td></tr></table></figure>
+
+<p>你可以在 I16LP32 目标架构上使用这个函数了，它可以处理更大的数据。而且在 IP16 和 IP32 平台上效果也还行，说明它确实给出了 memcpy 的一种移植性较好的申明。但是，在 IP16 平台上相比于使用 <code>unsigned int</code>，你使用 <code>unsigned long</code> 可能会使你的代码运行效率大打折扣（代码量变大而且运行变慢）。</p>
+<p>在标准 C 中规定，长整形（无论无符号或者有符号）至少占用 32 位，因此在 IP16 平台上支持标准 C 的话，那么它一定是 IP16L32 平台。这些平台通常使用一对 16 位的字来实现 32 位的长整形。在这种情况下，移动一个长整形需要两条机器指令，每条移动一个 16 位的块。事实上，这个平台上的大部分的 32 位操作都需要至上两条指令。</p>
+<p>因此，以可移植性为名将 memcpy 的第三个参数申明为 unsigned long 而降低某些平台的性能是我们所不希望看到的。使用 size_t 可以有效避免这种情况。</p>
+<p>size_t 类型是一个类型定义，通常将一些无符号的整形定义为 size_t，比如说 unsigned int 或者 unsigned long，甚至 unsigned long long。每一个标准 C 实现应该选择足够大的无符号整形来代表该平台上最大可能出现的对象大小。</p>
+<h2 id="使用-size-t"><a href="#使用-size-t" class="headerlink" title="使用 size_t"></a>使用 size_t</h2><p>size_t 的定义在 <code>&lt;stddef.h&gt;, &lt;stdio.h&gt;, &lt;stdlib.h&gt;, &lt;string.h&gt;, &lt;time.h&gt;和&lt;wchar.h&gt;</code> 这些标准 C 头文件中，也出现在相应的 C++ 头文件中，在使用 size_t 之前，你应该在你的头文件中至少包含一个这样的头文件。</p>
+<p>包含以上任何 C 头文件（由 C 或 C++ 编译的程序）表明将 size_t 作为全局关键字。包含以上任何 C++ 头文件（当你只能在 C++ 中做某种操作时）表明将 size_t 作为 std 命名空间的成员。</p>
+<p>根据定义，size_t 是 sizeof 关键字（注：sizeof 是关键字，并非运算符）运算结果的类型。所以，应当通过适当的方式声明 n 来完成赋值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">size_t</span> n = <span class="keyword">sizeof</span>(thing);</span><br></pre></td></tr></table></figure>
+
+<p>适当地使用 size_t 还会使你的代码变得如同自带文档。当你看到一个对象声明为 size_t 类型，你马上就知道它代表字节大小或数组索引，而不是错误代码或者是一个普通的算术值。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/"># 技术杂文</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/05/22/%E6%B5%85%E6%9E%90Linux%E4%B8%8B%E8%BF%9B%E7%A8%8B%E7%9A%84%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5%E4%B8%8E%E4%BC%98%E5%85%88%E7%BA%A7/">浅析Linux下进程的调度策略与优先级</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
