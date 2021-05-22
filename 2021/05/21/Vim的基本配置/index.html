@@ -107,68 +107,6 @@
             <div class="container">
     
     
-        <div class="post-toc">
-    <div class="tocbot-list">
-    </div>
-    <div class="tocbot-list-menu">
-        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
-        <a onclick="go_top()">Back to top</a>
-        <a onclick="go_bottom()">Go to bottom</a>
-    </div>
-</div>
-
-<script>
-    document.ready(
-        function () {
-            tocbot.init({
-                tocSelector: '.tocbot-list',
-                contentSelector: '.post-content',
-                headingSelector: 'h1, h2, h3, h4, h5',
-                collapseDepth: 1,
-                orderedList: false,
-                scrollSmooth: true,
-            })
-        }
-    )
-
-    function expand_toc() {
-        var b = document.querySelector(".tocbot-toc-expand");
-        tocbot.init({
-            tocSelector: '.tocbot-list',
-            contentSelector: '.post-content',
-            headingSelector: 'h1, h2, h3, h4, h5',
-            collapseDepth: 6,
-            orderedList: false,
-            scrollSmooth: true,
-        });
-        b.setAttribute("onclick", "collapse_toc()");
-        b.innerHTML = "Collapse all"
-    }
-
-    function collapse_toc() {
-        var b = document.querySelector(".tocbot-toc-expand");
-        tocbot.init({
-            tocSelector: '.tocbot-list',
-            contentSelector: '.post-content',
-            headingSelector: 'h1, h2, h3, h4, h5',
-            collapseDepth: 1,
-            orderedList: false,
-            scrollSmooth: true,
-        });
-        b.setAttribute("onclick", "expand_toc()");
-        b.innerHTML = "Expand all"
-    }
-
-    function go_top() {
-        window.scrollTo(0, 0);
-    }
-
-    function go_bottom() {
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-
-</script>
-    
 
     
     <article class="post-wrap">
@@ -200,6 +138,7 @@
         <div class="post-content">
             <h2 id="Vim-的基本配置"><a href="#Vim-的基本配置" class="headerlink" title="Vim 的基本配置"></a>Vim 的基本配置</h2><p>Vim 的默认配置不适合生产环境中的正常使用需求，因此需对 <code>.vimrc</code> 的配置文件进行配置设置。以下总结了一些 Vim 常用的配置方式。</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;设置编码&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">fileencodings</span>=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">termencoding</span>=utf-8</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">encoding</span>=utf-8</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示行号&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> nu</span><br><span class="line"><span class="builtin-name">set</span> number</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;突出显示当前行&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> cursorline</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;启用鼠标&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">mouse</span>=a</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">selection</span>=exclusive</span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">selectmode</span>=mouse,key</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示括号匹配&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> showmatch</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置Tab长度为4空格&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">tabstop</span>=4</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置自动缩进长度为4空格&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">shiftwidth</span>=4</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;继承前一行的缩进方式，适用于多行注释&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> autoindent</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置粘贴模式&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> paste</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示空格和tab键&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">listchars</span>=tab:&gt;-,trail:-</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;总是显示状态栏&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">laststatus</span>=2</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;显示光标当前位置&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> ruler</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;不要使用vi的键盘模式，而是vim自己的&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> nocompatible</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;侦测文件类型&#x27;</span></span><br><span class="line">filetype on</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;语法高亮&#x27;</span></span><br><span class="line">syntax <span class="builtin-name">enable</span></span><br><span class="line">syntax on</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;使回格键（backspace）正常处理&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">backspace</span>=2</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;设置制表符&#x27;</span></span><br><span class="line"><span class="builtin-name">set</span> <span class="attribute">tabstop</span>=4</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
         </div>
 
         
@@ -217,7 +156,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/"># 技术工具</a>
+                        <a href="/tags/vim/"># vim</a>
                     
                         
                 </span>

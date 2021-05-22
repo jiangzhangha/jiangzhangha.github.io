@@ -107,68 +107,6 @@
             <div class="container">
     
     
-        <div class="post-toc">
-    <div class="tocbot-list">
-    </div>
-    <div class="tocbot-list-menu">
-        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
-        <a onclick="go_top()">Back to top</a>
-        <a onclick="go_bottom()">Go to bottom</a>
-    </div>
-</div>
-
-<script>
-    document.ready(
-        function () {
-            tocbot.init({
-                tocSelector: '.tocbot-list',
-                contentSelector: '.post-content',
-                headingSelector: 'h1, h2, h3, h4, h5',
-                collapseDepth: 1,
-                orderedList: false,
-                scrollSmooth: true,
-            })
-        }
-    )
-
-    function expand_toc() {
-        var b = document.querySelector(".tocbot-toc-expand");
-        tocbot.init({
-            tocSelector: '.tocbot-list',
-            contentSelector: '.post-content',
-            headingSelector: 'h1, h2, h3, h4, h5',
-            collapseDepth: 6,
-            orderedList: false,
-            scrollSmooth: true,
-        });
-        b.setAttribute("onclick", "collapse_toc()");
-        b.innerHTML = "Collapse all"
-    }
-
-    function collapse_toc() {
-        var b = document.querySelector(".tocbot-toc-expand");
-        tocbot.init({
-            tocSelector: '.tocbot-list',
-            contentSelector: '.post-content',
-            headingSelector: 'h1, h2, h3, h4, h5',
-            collapseDepth: 1,
-            orderedList: false,
-            scrollSmooth: true,
-        });
-        b.setAttribute("onclick", "expand_toc()");
-        b.innerHTML = "Expand all"
-    }
-
-    function go_top() {
-        window.scrollTo(0, 0);
-    }
-
-    function go_bottom() {
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-
-</script>
-    
 
     
     <article class="post-wrap">
@@ -410,6 +348,7 @@
 
 <p>封装的函数定义如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">re_free_registers</span><span class="params">(struct re_pattern_buffer *buffer, struct re_registers *regs)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ( <span class="literal">NULL</span> != buffer &amp;&amp; REGS_REALLOCATE == buffer-&gt;regs_allocated)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="literal">NULL</span> != regs)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="literal">NULL</span> != regs-&gt;start)</span><br><span class="line">            &#123;</span><br><span class="line">                re_free(regs-&gt;start);</span><br><span class="line">                regs-&gt;start = <span class="literal">NULL</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (<span class="literal">NULL</span> != regs-&gt;end)</span><br><span class="line">            &#123;</span><br><span class="line">                re_free(regs-&gt;end);</span><br><span class="line">                regs-&gt;end = <span class="literal">NULL</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        buffer-&gt;regs_allocated = REGS_UNALLOCATED;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 通常以数组的形式定义一组T_ReReg结构，因为往往正则表达式中还包含子正则表达式，即存在分组</span></span><br><span class="line"><span class="comment">   数组0单元存放主正则表达式的位置</span></span><br><span class="line"><span class="comment">   数组1、2、3...依次存放子正则表达式的位置 */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">cp_reMatch</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *pattern, <span class="keyword">const</span> <span class="keyword">char</span> *<span class="built_in">string</span>, T_ReReg *reRegs, <span class="keyword">unsigned</span> <span class="keyword">int</span> *regNum)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">re_pattern_buffer</span> <span class="title">regex</span>;</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *err = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">int</span> num = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    re_set_syntax(RE_SYNTAX_POSIX_EGREP);</span><br><span class="line">    <span class="built_in">memset</span>(&amp;regex, <span class="number">0</span>, <span class="keyword">sizeof</span>(regex));</span><br><span class="line">    err = re_compile_pattern(pattern, <span class="built_in">strlen</span>(pattern), &amp;regex);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == err)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">re_registers</span> <span class="title">regs</span>;</span></span><br><span class="line">        <span class="built_in">memset</span>(&amp;regs, <span class="number">0</span>, <span class="keyword">sizeof</span>(regs));</span><br><span class="line">        re_set_registers(&amp;regex, &amp;regs, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">        num = re_match(&amp;regex, <span class="built_in">string</span>, <span class="built_in">strlen</span>(<span class="built_in">string</span>), <span class="number">0</span>, &amp;regs);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* fill regular expression registers */</span></span><br><span class="line">        <span class="keyword">if</span> ((<span class="literal">NULL</span> != reRegs) &amp;&amp; (<span class="literal">NULL</span> != regNum) &amp;&amp; ((*regNum) &gt; <span class="number">0</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">unsigned</span> <span class="keyword">int</span> i;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="number">0</span>; (i &lt; regs.num_regs) &amp;&amp; (i &lt; *regNum); i++)</span><br><span class="line">            &#123;</span><br><span class="line">                reRegs[i].start = regs.start[i];</span><br><span class="line">                reRegs[i].end = regs.end[i];</span><br><span class="line">            &#125;</span><br><span class="line">            *regNum = i;</span><br><span class="line">        &#125;</span><br><span class="line">        re_free_registers(&amp;regex, &amp;regs);</span><br><span class="line">        regfree(&amp;regex);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
         </div>
 
         
@@ -427,7 +366,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/"># 技术工具</a>
+                        <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/"># 正则表达式</a>
                     
                         
                 </span>
