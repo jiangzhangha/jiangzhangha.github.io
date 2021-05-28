@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>Linux 下查看端口是否被占用 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Linux 下查看端口是否被占用</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 28, 2021&nbsp;&nbsp;14:47:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/">技术杂文</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="netstat-命令"><a href="#netstat-命令" class="headerlink" title="netstat 命令"></a>netstat 命令</h1><p>在 Linux 下，<code>netstat</code> 命令用于显示网络状态，包括与 IP、TCP、UDP、ICMP 协议相关的统计数据，一般用于校验本机各个端口的网络连接情况。</p>
+<h2 id="输出结果"><a href="#输出结果" class="headerlink" title="输出结果"></a>输出结果</h2><p>命令 <code>netstat</code> 的输出结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[jamza@A23488811 scp]$ netstat</span><br><span class="line">Active Internet connections (w/o servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State</span><br><span class="line">tcp        0      0 A23488811:ssh           10.40.150.192:58105     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:rfb           10.40.150.192:60593     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:microsoft-ds  10.40.150.192:63671     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:39334         192.168.222.101:ssh     ESTABLISHED</span><br><span class="line">tcp        0     36 A23488811:ssh           10.40.150.192:60939     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:40468         192.168.222.101:ssh     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:60784         10.136.147.101:7788     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:nfs           192.168.222.102:1019    ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:ssh           10.40.150.192:60030     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:40470         192.168.222.101:ssh     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:ssh           10.40.150.192:58115     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:nfs           192.168.222.101:781     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:nfs           192.168.222.103:880     ESTABLISHED</span><br><span class="line">tcp        0      1 A23488811:54622         10.46.75.9:webcache     SYN_SENT</span><br><span class="line">tcp        0      0 A23488811:nfs           192.168.222.104:947     ESTABLISHED</span><br><span class="line">tcp        0      0 A23488811:ssh           10.40.150.192:58094     ESTABLISHED</span><br><span class="line">tcp        0      1 A23488811:54624         10.46.75.9:webcache     SYN_SENT</span><br><span class="line">Active UNIX domain sockets (w/o servers)</span><br><span class="line">Proto RefCnt Flags       Type       State         I-Node   Path</span><br><span class="line">unix  2      [ ]         DGRAM                    3737037  /var/lib/samba/private/msg.sock/32132</span><br><span class="line">unix  2      [ ]         DGRAM                    3735758  /var/lib/samba/private/msg.sock/32133</span><br><span class="line">unix  2      [ ]         DGRAM                    3728159  /var/lib/samba/private/msg.sock/32134</span><br><span class="line">unix  2      [ ]         DGRAM                    3735789  /var/lib/samba/private/msg.sock/32163</span><br><span class="line">unix  2      [ ]         DGRAM                    38712407 /var/lib/samba/private/msg.sock/761</span><br><span class="line">unix  2      [ ]         DGRAM                    1405     /run/systemd/notify</span><br><span class="line">unix  2      [ ]         DGRAM                    1407     /run/systemd/cgroups-agent</span><br><span class="line">unix  8      [ ]         DGRAM                    1419     /run/systemd/journal/socket</span><br><span class="line">unix  32     [ ]         DGRAM                    1421     /dev/log</span><br><span class="line">unix  2      [ ]         DGRAM                    35313364 /var/titanagent/webshell_monitor.socket</span><br><span class="line">unix  2      [ ]         DGRAM                    35308343 /var/titanagent/jar/java_monitor_1377</span><br><span class="line">unix  2      [ ]         DGRAM                    35308371 /var/titanagent/jar/java_monitor_1386</span><br><span class="line">unix  2      [ ]         DGRAM                    9135     /run/systemd/shutdownd</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>命令 <code>netstat</code> 的输出分为了两个部分，分别是 <code>Active Internet connections (w/o servers)</code>，与 <code>Active UNIX domain sockets (w/o servers)</code>。</p>
+<p><code>Active Internet connections (w/o servers)</code> 被称为有源 TCP 连接，其中的 <code>Recv-Q</code> 与 <code>Send-Q</code> 指的是接收队列与发送队列，这些数字正常情况下应该为 0，如果非 0 则表示软件包正在队列中堆积。</p>
+<p><code>Active UNIX domain sockets (w/o servers)</code> 被称为有源 Unix 域套接口。</p>
+<p><code>Proto</code> 显示连接使用的协议，<code>RefCnt</code> 表示连接到本套接口上的进程数量，<code>Type</code> 显示套接字的类型，<code>State</code> 显示套接字的当前状态，<code>Path</code> 显示连接到套接字的其他进程使用的路径名。</p>
+<p>状态说明：</p>
+<ol>
+<li><code>LISTEN</code>：监听来自远端的 TCP 端口连接请求</li>
+<li><code>ESTABLISHED</code>：表示一个打开的连接</li>
+<li><code>SYN-SENT</code>：在发送连接请求后，等待匹配的连接请求</li>
+<li><code>SYN-RECEIVED</code>：在收到和发送一个连接请求后，等待对方连接请求的确认</li>
+<li><code>CLOSE-WAIT</code>：等待从本地用户发送的连接中断请求</li>
+<li><code>CLOSING</code>：等待远程 TCP 对连接中断的确认</li>
+<li><code>CLOSED</code>：没有任何连接状态</li>
+</ol>
+<h2 id="选项参数"><a href="#选项参数" class="headerlink" title="选项参数"></a>选项参数</h2><ol>
+<li><code>-a</code> 或者 <code>--all</code>：显示所有连接状态中的套接口</li>
+<li><code>-n</code> 或者 <code>--numeric</code>：直接使用 IP 地址，而不通过域名服务器</li>
+<li><code>-p</code> 或者 <code>--programs</code>：显示正在使用套接口的程序 PID 与程序名称</li>
+<li><code>-r</code> 或者 <code>--route</code>：显示 routing table</li>
+<li><code>-s</code> 或者 <code>--statistics</code>：显示网络工作信息统计表</li>
+<li><code>-t</code> 或者 <code>--tcp</code>：显示 TCP 传输协议的连接状况</li>
+<li><code>-u</code> 或者 <code>--udp</code>：显示 UDP 传输协议的连接状况</li>
+<li><code>-v</code> 或者 <code>--verbose</code>：显示指令执行过程</li>
+</ol>
+<h1 id="检测端口是否被占用"><a href="#检测端口是否被占用" class="headerlink" title="检测端口是否被占用"></a>检测端口是否被占用</h1><p>通过常用的命令 <code>netstat -anp | grep 端口号</code>，查询当前的端口被哪个进程所占用。</p>
+<p>比如，查询当前环境中，端口号 <code>6666</code> 与 <code>10000</code> 是否被占用：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@vm_rp0_cpu0_docker ~]# netstat -anp | grep 6666</span><br><span class="line">[root@vm_rp0_cpu0_docker ~]#</span><br><span class="line">[root@vm_rp0_cpu0_docker ~]# netstat -anp | grep 10000</span><br><span class="line">tcp        0      0 0.0.0.0:10000           0.0.0.0:*               LISTEN      27366/./ADM</span><br><span class="line">tcp        0      0 127.0.0.1:46028         127.0.0.1:10000         ESTABLISHED 30693/telnet</span><br><span class="line">tcp        0      0 127.0.0.1:10000         127.0.0.1:46028         ESTABLISHED 27366/./ADM</span><br><span class="line">udp        0      0 0.0.0.0:10000           0.0.0.0:*                           27366/./ADM</span><br><span class="line">[root@vm_rp0_cpu0_docker ~]#</span><br></pre></td></tr></table></figure>
+
+<p>可以看出，端口 <code>6666</code> 未被占用，但是端口 <code>10000</code> 被 PID 为 27366 的 ADM 进程所占用。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%AB%AF%E5%8F%A3/"># 端口</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/05/26/shell%E5%91%BD%E4%BB%A4tar%E4%BD%BF%E7%94%A8%E7%AE%80%E4%BB%8B/">shell 命令 tar 的使用简介</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
