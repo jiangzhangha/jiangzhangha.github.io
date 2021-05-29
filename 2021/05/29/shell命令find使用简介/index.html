@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>shell 命令 find 的使用简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">shell 命令 find 的使用简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 29, 2021&nbsp;&nbsp;10:45:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p><code>find</code> 命令是 Linux 中强大的搜索命令，不仅可以按照文件名搜索文件，还可以按照权限、文件大小、时间属性、inode 等来搜索文件。</p>
+<p>但是 <code>find</code> 命令是直接在硬盘中进行搜索，如果指定的搜索范围较大，则命令会消耗较大的系统资源，搜索过程耗时较长。</p>
+<h1 id="命令格式"><a href="#命令格式" class="headerlink" title="命令格式"></a>命令格式</h1><p><code>find</code> 命令的基本格式为：<code>find 搜索路径 [选项] 搜索内容</code></p>
+<p><code>find</code> 命令具有两个参数：</p>
+<ol>
+<li>第一个参数指定搜索路径</li>
+<li>第二个参数指定搜索内容</li>
+</ol>
+<h1 id="按照文件名搜索"><a href="#按照文件名搜索" class="headerlink" title="按照文件名搜索"></a>按照文件名搜索</h1><p>支持的选项：</p>
+<ol>
+<li><code>-name</code>：按照文件名搜索</li>
+<li><code>-iname</code>：按照文件名搜索，不区分文件名大小写</li>
+<li><code>-inum</code>：按照 inode 号搜索</li>
+</ol>
+<p>举例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 ~]# find /etc/ -name yum.conf</span><br><span class="line">/etc/yum.conf</span><br><span class="line">[root@A23488811 ~]#</span><br></pre></td></tr></table></figure>
+
+<p><code>find</code> 命令是完全匹配的，搜索结果必须与搜索内容完全匹配，比如搜索 yum.conf，则类似 bak_yum.conf 的文件不会被搜索到。</p>
+<p><code>-name</code> 选项是区分大小写的，如果需要不区分大小写，则使用 <code>-iname</code> 选项。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 ~]# find /etc/ -iname YUM.conf</span><br><span class="line">/etc/yum.conf</span><br><span class="line">[root@A23488811 ~]#</span><br></pre></td></tr></table></figure>
+
+<p>还可以通过 inode 号来搜索文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 ~]# ls -i /etc/yum.conf</span><br><span class="line">1074761167 /etc/yum.conf</span><br><span class="line">[root@A23488811 ~]#</span><br><span class="line">[root@A23488811 ~]# find /etc/ -inum 1074761167</span><br><span class="line">/etc/yum.conf</span><br><span class="line">[root@A23488811 ~]#</span><br></pre></td></tr></table></figure>
+
+<h1 id="按照文件大小搜索"><a href="#按照文件大小搜索" class="headerlink" title="按照文件大小搜索"></a>按照文件大小搜索</h1><p>支持的选项：</p>
+<ol>
+<li><code>-size [+-]</code>：按照指定大小搜索文件，<code>+</code> 表示搜索比指定大小还要大的文件，<code>-</code> 表示搜索比指定大小还要小的文件</li>
+</ol>
+<p>注意，<code>find</code> 命令对于指定的文件大小的单位有一些特别，且与 <code>ls</code> 命令显示的大小有所区别。</p>
+<p>可查看 <code>find</code> 命令的 man 手册，如果不指定单位，则 <code>size</code> 的默认单位为 512Byte：</p>
+<blockquote>
+<p>-size n[cwbkMG]<br>File uses n units of space.  The following suffixes can be used:<br><code>b&#39;    for 512-byte blocks (this is the default if no suffix is used) </code></p>
+<p><code>c&#39;    for bytes</code> `</p>
+<p><code>w&#39;    for two-byte words </code></p>
+<p><code>k&#39;    for Kilobytes (units of 1024 bytes) </code></p>
+<p><code>M&#39;    for Megabytes (units of 1048576 bytes) </code></p>
+<p><code>G&#39;    for Gigabytes (units of 1073741824 bytes) </code></p>
+<p>The  size does not count indirect blocks, but it does count blocks in sparse files that are not actually allocated.  Bear in mind that the %k’ and %b’ format specifiers of -printf handle sparse  files  differently.   The  `b’  suffix  always<br>denotes 512-byte blocks and never 1 Kilobyte blocks, which is different to the behaviour of -ls.</p>
+</blockquote>
+<p>举例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# ll</span><br><span class="line">total 4</span><br><span class="line">-rw-r--r-- 1 root root 12 May 29 10:01 1.txt</span><br><span class="line">[root@A23488811 test]#</span><br><span class="line">[root@A23488811 test]# find ./ -size 12</span><br><span class="line">[root@A23488811 test]#</span><br><span class="line">[root@A23488811 test]# find ./ -size 12c</span><br><span class="line">./1.txt</span><br><span class="line">[root@A23488811 test]#</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="按照修改时间搜索"><a href="#按照修改时间搜索" class="headerlink" title="按照修改时间搜索"></a>按照修改时间搜索</h1><p>在 Linux 系统中，每个文件具有访问时间（atime）、数据修改时间（mtime）、状态修改时间（ctime），<code>find</code> 命令可以通过时间来搜索文件。</p>
+<p>支持的选项：</p>
+<ol>
+<li><code>-atime [+-]</code>：按照文件访问时间搜索</li>
+<li><code>-mtime [+-]</code>：按照文件数据修改时间搜索</li>
+<li><code>-ctime [+-]</code>：按照文件状态修改时间搜索</li>
+</ol>
+<p>这里对于 <code>+-</code> 的含义说明为：</p>
+<ol>
+<li><code>-5</code>：表示 5 天内修改的文件</li>
+<li><code>5</code>：表示当前时间之前第 5-6 那一天修改的文件</li>
+<li><code>+5</code>：表示 6 天之前修改的文件</li>
+</ol>
+<p>时间轴的解释示意图如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">current 1   2   3   4   5   6   7   8   9</span><br><span class="line">    |   |   |   |   |   |   |   |   |   |  ------&gt;</span><br><span class="line">    |&lt;-     -5       -&gt; | 5 |&lt;-      +5    ------&gt;</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="按照权限搜索"><a href="#按照权限搜索" class="headerlink" title="按照权限搜索"></a>按照权限搜索</h1><p>支持的选项：</p>
+<ol>
+<li><code>-perm 权限模式</code>：查找的文件权限刚好等于“权限模式”的文件</li>
+<li><code>-perm -权限模式</code>：查找的文件权限全部包含“权限模式”的文件</li>
+<li><code>-perm +权限模式</code>：查找的文件权限包含“权限模式”的任意一个权限的文件</li>
+</ol>
+<h1 id="按照所有者与所属组搜索"><a href="#按照所有者与所属组搜索" class="headerlink" title="按照所有者与所属组搜索"></a>按照所有者与所属组搜索</h1><p>支持的选项：</p>
+<ol>
+<li><code>-uid</code>：查找所有者是指定 id 的文件</li>
+<li><code>-gid</code>：查找所属组是指定 id 的文件</li>
+<li><code>-user</code>：查找所有者是指定用户名的文件</li>
+<li><code>-group</code>：查找所属组是指定组名的文件</li>
+<li><code>-nouser</code>：查找没有所有者的文件，主要用于查找垃圾文件</li>
+</ol>
+<p>比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# ll</span><br><span class="line">total 4</span><br><span class="line">-rw-r--r-- 1 root root 12 May 29 10:01 1.txt</span><br><span class="line">[root@A23488811 test]#</span><br><span class="line">[root@A23488811 test]# find ./ -user root</span><br><span class="line">./</span><br><span class="line">./1.txt</span><br><span class="line">[root@A23488811 test]#</span><br></pre></td></tr></table></figure>
+
+<h1 id="按照文件类型搜索"><a href="#按照文件类型搜索" class="headerlink" title="按照文件类型搜索"></a>按照文件类型搜索</h1><p>支持的选项：</p>
+<ol>
+<li><code>-type d</code>：查找目录</li>
+<li><code>-type f</code>：查找普通文件</li>
+<li><code>-type l</code>：查找软链接文件</li>
+</ol>
+<p>举例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# ll</span><br><span class="line">total 4</span><br><span class="line">-rw-r--r-- 1 root root 12 May 29 10:01 1.txt</span><br><span class="line">-rw-r--r-- 1 root root  0 May 29 10:27 2.txt</span><br><span class="line">drwxr-xr-x 2 root root  6 May 29 10:27 dir1</span><br><span class="line">drwxr-xr-x 2 root root  6 May 29 10:27 dir2</span><br><span class="line">[root@A23488811 test]#</span><br><span class="line">[root@A23488811 test]# find ./ -type d</span><br><span class="line">./</span><br><span class="line">./dir1</span><br><span class="line">./dir2</span><br><span class="line">[root@A23488811 test]#</span><br><span class="line">[root@A23488811 test]# find ./ -type f</span><br><span class="line">./1.txt</span><br><span class="line">./2.txt</span><br><span class="line">[root@A23488811 test]#</span><br></pre></td></tr></table></figure>
+
+<h1 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h1><p>支持的选项：</p>
+<ol>
+<li><code>-a</code>：逻辑与 and，表示逻辑与的两个条件都成立，搜索结果才成立</li>
+<li><code>-o</code>：逻辑或 or，表示逻辑或的两个条件至少一个成立，搜索结果就成立</li>
+<li><code>-not</code>：逻辑非 not</li>
+</ol>
+<p>举例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">在当前目录下搜索3天以内修改过，并且权限是644的文件</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# find.-mtime -3 -a -perm 644</span><br><span class="line"></span><br><span class="line">在当前目录下搜索文件名要么是cangls的文件，要么是bols的文件</span><br><span class="line"></span><br><span class="line">[root@localhost ~]#find.-name cangls -o -name bols</span><br><span class="line">./cangls</span><br><span class="line">./bols</span><br><span class="line"></span><br><span class="line">在当前目录下搜索文件名不是cangls的文件</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# find.-not -name cangls</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/find/"># find</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/05/28/Linux%E4%B8%8B%E6%9F%A5%E7%9C%8B%E7%AB%AF%E5%8F%A3%E6%98%AF%E5%90%A6%E8%A2%AB%E5%8D%A0%E7%94%A8/">Linux 下查看端口是否被占用</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
