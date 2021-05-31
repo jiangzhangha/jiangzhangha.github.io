@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>shell 命令 wc 的使用简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">shell 命令 wc 的使用简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">May 31, 2021&nbsp;&nbsp;9:50:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p><code>wc</code> 命令可以帮助我们计算文件的字节数、字数、或者文件的行数，常用于统计文件的相关信息。</p>
+<p><code>wc</code> 命令的 帮助信息比较简短：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# wc --help</span><br><span class="line">Usage: wc [OPTION]... [FILE]...</span><br><span class="line">  or:  wc [OPTION]... --files0-from=F</span><br><span class="line">Print newline, word, and byte counts for each FILE, and a total line if</span><br><span class="line">more than one FILE is specified.  With no FILE, or when FILE is -,</span><br><span class="line">read standard input.  A word is a non-zero-length sequence of characters</span><br><span class="line">delimited by white space.</span><br><span class="line">The options below may be used to select which counts are printed, always in</span><br><span class="line">the following order: newline, word, character, byte, maximum line length.</span><br><span class="line">  -c, --bytes            print the byte counts</span><br><span class="line">  -m, --chars            print the character counts</span><br><span class="line">  -l, --lines            print the newline counts</span><br><span class="line">      --files0-from=F    read input from the files specified by</span><br><span class="line">                           NUL-terminated names in file F;</span><br><span class="line">                           If F is - then read names from standard input</span><br><span class="line">  -L, --max-line-length  print the length of the longest line</span><br><span class="line">  -w, --words            print the word counts</span><br><span class="line">      --help     display this help and exit</span><br><span class="line">      --version  output version information and exit</span><br><span class="line"></span><br><span class="line">GNU coreutils online help: &lt;http://www.gnu.org/software/coreutils/&gt;</span><br><span class="line">For complete documentation, run: info coreutils &#x27;wc invocation&#x27;</span><br></pre></td></tr></table></figure>
+
+<h1 id="参数选项"><a href="#参数选项" class="headerlink" title="参数选项"></a>参数选项</h1><p>支持的主要参数选项包括：</p>
+<ol>
+<li><code>-c</code>：统计字节数</li>
+<li><code>-m</code>：统计字符数，该参数不能与 <code>-c</code> 一起使用</li>
+<li><code>-l</code>：统计行数</li>
+<li><code>-w</code>：统计字数，这里的字指的是由空格、换行符等分隔的字符串</li>
+</ol>
+<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><p>使用以下的文件作为测试文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# cat testfile</span><br><span class="line">Linux networks are becoming more and more common, but scurity is often an overlooked</span><br><span class="line">issue. Unfortunately, in today’s environment all networks are potential hacker targets,</span><br><span class="line">fro0m tp-secret military research networks to small home LANs.</span><br><span class="line">Linux Network Securty focuses on securing Linux in a networked environment, where the</span><br><span class="line">security of the entire network needs to be considered rather than just isolated machines.</span><br><span class="line">It uses a mix of theory and practicl techniques to teach administrators how to install and</span><br><span class="line">use security applications, as well as how the applcations work and why they are necesary.</span><br><span class="line">[root@A23488811 test]#</span><br></pre></td></tr></table></figure>
+
+<p>对测试文件直接使用 <code>wc</code> 命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# wc testfile</span><br><span class="line">  7  92 608 testfile</span><br></pre></td></tr></table></figure>
+
+<p><code>7</code> 表示测试文件的行数，<code>92</code> 表示测试文件的字数，<code>608</code> 表示测试文件的字节数：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# wc -l testfile</span><br><span class="line">7 testfile</span><br><span class="line">[root@A23488811 test]# wc -w testfile</span><br><span class="line">92 testfile</span><br><span class="line">[root@A23488811 test]# wc -c testfile</span><br><span class="line">608 testfile</span><br></pre></td></tr></table></figure>
+
+<p>可以通过命令输出的重定向功能，使得 <code>wc</code> 命令获得更广泛的使用方式，比如</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 test]# ll</span><br><span class="line">total 16</span><br><span class="line">drwxr-xr-x 2 root root   6 May 31 09:37 test</span><br><span class="line">-rw-r--r-- 1 root root 608 May 31 09:29 testfile</span><br><span class="line">-rw-r--r-- 1 root root 608 May 31 09:37 testfile1</span><br><span class="line">-rw-r--r-- 1 root root 608 May 31 09:37 testfile2</span><br><span class="line">-rw-r--r-- 1 root root 608 May 31 09:37 testfile3</span><br><span class="line">[root@A23488811 test]#</span><br><span class="line">[root@A23488811 test]#</span><br><span class="line">[root@A23488811 test]# ll | grep &quot;^-&quot; | wc -l</span><br><span class="line">4</span><br></pre></td></tr></table></figure>
+
+<p>以上命令可以统计当前目录下具有多少个普通文件。其中 <code>grep &quot;^-&quot;</code> 表示获取以 <code>-</code> 开头的行，这些行表示的都是普通文件，通过命令输出的重定向，作为 <code>wc</code> 命令的输入，可统计出当前目录下普通文件的数量。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/wc/"># wc</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/05/29/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%B0%86%E5%88%9B%E5%BB%BA%E8%BF%9B%E7%A8%8B%E7%9A%84API%E8%AE%BE%E8%AE%A1%E4%B8%BAfork%E4%B8%8Eexec%E4%B8%A4%E4%B8%AA%E5%87%BD%E6%95%B0%E5%A4%84%E7%90%86/">为什么将创建进程的 API 设计为 fork 与 exec 分离？</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
