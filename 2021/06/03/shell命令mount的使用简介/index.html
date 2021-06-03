@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>shell 命令 mount 的使用简介 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">shell 命令 mount 的使用简介</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 3, 2021&nbsp;&nbsp;15:30:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E5%B7%A5%E5%85%B7/">技术工具</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p><code>mount</code> 命令可以将分区挂载到 Linux 下的某一个目录上，从而将分区与该目录联系起来，因此只要访问该目录，就相当于访问该分区。</p>
+<p><code>mount</code> 命令的参数非常多，具体的中文手册可参考 <a target="_blank" rel="noopener" href="http://www.jinbuguo.com/man/mount.html">mount 中文手册</a>，本文仅介绍 <code>mount</code> 的基本使用方式。</p>
+<h1 id="命令格式"><a href="#命令格式" class="headerlink" title="命令格式"></a>命令格式</h1><p><code>mount</code> 命令的格式可概括为：<code>mount [-t vfstype] [-o options] device dir</code></p>
+<p>命令中 <code>-t vfstype</code> 指定文件系统的类型，通常可以不必指定，<code>mount</code> 命令会自动选择正确的类型，文件系统的类型主要包括：</p>
+<ul>
+<li><code>iso9660</code>：光盘或者光盘镜像</li>
+<li><code>msdos</code>：DOS fat16 文件系统</li>
+<li><code>ntfs</code>：Windows NT nfts 文件系统</li>
+<li><code>vfat</code>：Windows 9x fat32 文件系统</li>
+<li><code>smbfs</code>：Windows 文件网络共享</li>
+<li><code>nfs</code>：Unix 文件网络共享</li>
+</ul>
+<p>命令中 <code>-o options</code> 主要用来描述设备或者档案的挂载方式，支持的方式主要包括：</p>
+<ul>
+<li><code>loop</code>：用来将一个文件当成硬盘分区挂载到系统</li>
+<li><code>ro</code>：按照只读方式挂载设备</li>
+<li><code>rw</code>：按照读写方式挂载设备</li>
+<li><code>iocharset</code>：指定访问文件系统所用的字符集</li>
+</ul>
+<p>命令中的 <code>device</code> 指的是要挂载的设备</p>
+<p>命令中的 <code>dir</code> 指的是设备在系统上的挂载点</p>
+<h1 id="挂载光盘镜像文件"><a href="#挂载光盘镜像文件" class="headerlink" title="挂载光盘镜像文件"></a>挂载光盘镜像文件</h1><p>将当前光驱里的光盘制作成光盘镜像文件 <code>/home/sunky/mydisk.iso</code>，可以执行以下命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> cp /dev/cdrom /home/sunky/mydisk.iso</span></span><br></pre></td></tr></table></figure>
+
+<p>或者执行以下命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> dd <span class="keyword">if</span>=/dev/cdrom of=/home/sunky/mydisk.iso</span></span><br></pre></td></tr></table></figure>
+
+
+<p>将系统中的文件和目录制作成光盘镜像文件，可执行以下的命令，这条命令将 <code>/home/sunky/mydir</code> 目录下所有的目录和文件制作成光盘镜像文件 <code>/home/sunky/mydisk.iso</code>，光盘卷标为 <code>mydisk</code>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> mkisofs -r -J -V mydisk -o /home/sunky/mydisk.iso /home/sunky/ mydir</span></span><br></pre></td></tr></table></figure>
+
+
+<p>将光盘镜像文件挂载到系统的 <code>/mnt/vcdrom</code> 目录上，可以执行以下的命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> mkdir /mnt/vcdrom</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> mount -o loop -t iso9660 /home/sunky/mydisk.iso /mnt/vcdrom</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="挂载移动硬盘"><a href="#挂载移动硬盘" class="headerlink" title="挂载移动硬盘"></a>挂载移动硬盘</h1><p>对 Linux 系统而言，USB 接口的移动硬盘是被当作 SCSI 设备对待，为了确定移动硬盘的硬盘分区情况，可以在插入硬盘设备之前，使用 <code>fdisk -l</code> 命令，或者 <code>more /proc/partitions</code> 查看系统的硬盘与硬盘分区情况，在插入移动硬盘后，再使用 <code>fdisk -l</code> 命令，或者 <code>more /proc/partitions</code> 查看。理论上应该可以发现多了一个硬盘与对应的分区。假设多出来的硬盘为 <code>/dev/sdc</code>，硬盘分区为 <code>/dev/sdc1</code> 与 <code>/dev/sdc2</code>。使用如下的命令进行挂载：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> mkdir -p /mnt/usbhd1</span> </span><br><span class="line"><span class="meta">#</span><span class="bash"> mkdir -p /mnt/usbhd2</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> mount -t ntfs -o iocharset=cp936 /dev/sdc1 /mnt/usbhd1</span> </span><br><span class="line"><span class="meta">#</span><span class="bash"> mount -t vfat -o iocharset=cp936 /dev/sdc5 /mnt/usbhd2</span> </span><br></pre></td></tr></table></figure>
+
+<p>对 ntfs 格式的硬盘分区，使用 <code>-t ntfs</code> 参数，对 fat32 格式的硬盘分区，使用 <code>-t vfat</code> 参数，若汉字文件名显示为乱码，则可以通过 <code>-o iocharset=cp936</code> 指定字符集。</p>
+<h1 id="挂载-Windows-文件共享"><a href="#挂载-Windows-文件共享" class="headerlink" title="挂载 Windows 文件共享"></a>挂载 Windows 文件共享</h1><p>Windows 网络共享的核心是 SMB，在 Linux 下挂载 Windows 的磁盘共享，必须安装和使用 samba 服务，现在流行的 Linux 发行版绝大部分都已经包含了 samba 软件包。</p>
+<p>在 Windows 系统共享设置完成后，就可以在 Linux 客户端挂载磁盘共享了，具体操作可参考：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> mkdir –p /mnt/samba</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> mount -t smbfs -o username=administrator,password=pldy123 //10.140.133.23/c$ /mnt/samba</span></span><br></pre></td></tr></table></figure>
+
+<p>在以上的命令范例中，<code>administrator</code> 与 <code>pldy123</code> 是 IP 地址为 <code>10.140.133.23</code> 的 Windows 计算机的一个用户名与密码，<code>c$</code> 是这台计算机的一个磁盘共享，这样在 Linux 系统上就可以通过 <code>/mnt/samba</code> 来访问 Windows 系统磁盘上的文件。</p>
+<h1 id="挂载-Unix-系统-NFS-文件共享"><a href="#挂载-Unix-系统-NFS-文件共享" class="headerlink" title="挂载 Unix 系统 NFS 文件共享"></a>挂载 Unix 系统 NFS 文件共享</h1><p>类似于 Windows 的网络共享，Unix 系统也有其自己的网络共享，即网络文件系统 NFS，在 Linux 客户端挂载 NFS 磁盘共享之前，必须先配置好 NFS 服务端。</p>
+<p>修改 <code>/etc/exports</code>，增加共享目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/export/home/sunky 10.140.133.23(rw) </span><br><span class="line">/export/home/sunky1 *(rw) </span><br><span class="line">/export/home/sunky2 linux-client(rw)</span><br></pre></td></tr></table></figure>
+
+<p>在以上的设置中，<code>/export/home/</code> 目录下的 <code>sunky</code>，<code>sunky1</code> 与 <code>sunky2</code> 是准备共享的目录，<code>10.140.133.23</code>、<code>*</code>、<code>linux-client</code> 是被允许挂载到此共享 Linux 客户机的 IP 地址或者主机名，如果使用主机名，则必须在服务端主机 <code>/etc/hosts</code> 文件中增加对应的条目。</p>
+<p>然后启动与停止 NFS 服务：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/etc/rc.d/init.d/portmap start     (在REDHAT中PORTMAP是默认启动的) </span><br><span class="line">/etc/rc.d/init.d/nfs start         启动NFS服务 </span><br><span class="line">/etc/rc.d/init.d/nfs stop          停止NFS服务</span><br></pre></td></tr></table></figure>
+
+<p>随后，Linux 客户端挂载其他的 Unix 系统的 NFS 共享，可执行以下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> mkdir –p /mnt/nfs</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> mount -t nfs -o rw 10.140.133.9:/<span class="built_in">export</span>/home/sunky /mnt/nfs</span></span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/shell%E5%91%BD%E4%BB%A4/"># shell命令</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/05/31/shell%E5%91%BD%E4%BB%A4wc%E7%9A%84%E4%BD%BF%E7%94%A8%E7%AE%80%E4%BB%8B/">shell 命令 wc 的使用简介</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
