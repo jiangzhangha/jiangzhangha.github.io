@@ -230,6 +230,7 @@
 </ol>
 <p>举例：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">在当前目录下搜索3天以内修改过，并且权限是644的文件</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# find.-mtime -3 -a -perm 644</span><br><span class="line"></span><br><span class="line">在当前目录下搜索文件名要么是cangls的文件，要么是bols的文件</span><br><span class="line"></span><br><span class="line">[root@localhost ~]#find.-name cangls -o -name bols</span><br><span class="line">./cangls</span><br><span class="line">./bols</span><br><span class="line"></span><br><span class="line">在当前目录下搜索文件名不是cangls的文件</span><br><span class="line"></span><br><span class="line">[root@localhost ~]# find.-not -name cangls</span><br></pre></td></tr></table></figure>
+
         </div>
 
         
@@ -247,7 +248,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/find/"># find</a>
+                        <a href="/tags/shell%E5%91%BD%E4%BB%A4/"># shell命令</a>
                     
                         
                 </span>
