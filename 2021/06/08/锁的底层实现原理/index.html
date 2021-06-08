@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>锁的底层实现原理 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">锁的底层实现原理</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 8, 2021&nbsp;&nbsp;17:00:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/">技术杂文</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="锁的基本思想"><a href="#锁的基本思想" class="headerlink" title="锁的基本思想"></a>锁的基本思想</h1><p>在并发编程中的一个基本问题是，希望原子执行一系列命令，但是由于单处理器上的中断，或者多处理器上的多线程并发执行，需要锁机制来解决这样的问题。</p>
+<p>使用锁的方式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">lock_t</span> mutex;</span><br><span class="line">...</span><br><span class="line">lock(&amp;mutex);</span><br><span class="line"><span class="comment">/* 临界区代码 */</span></span><br><span class="line">unlock(&amp;mutex);</span><br></pre></td></tr></table></figure>
+
+<p><code>lock</code>与<code>unlock</code>函数的语义比较简单，调用<code>lock</code>尝试获取锁，如果没有其他的线程持有锁，则该锁是可用的，该线程会获得锁，从而进入临界区，这个线程被称为锁的持有者。</p>
+<p>如果另外一个线程对相同的锁变量调用<code>lock</code>，因为锁被别的线程所持有，该调用不会返回，这个线程就无法进入临界区，直到锁的持有者释放了锁为止。</p>
+<h1 id="评价锁的实现机制"><a href="#评价锁的实现机制" class="headerlink" title="评价锁的实现机制"></a>评价锁的实现机制</h1><p>如何评价一种锁的实现机制的好坏？可以制定以下的一些标准：</p>
+<ul>
+<li>互斥性，即锁是否有效，是否能够阻止多线程进入临界区；</li>
+<li>公平性，即当锁可用时，是否每一个竞争线程有公平的机会抢到锁，从另一方面看，是否有竞争锁的线程会饿死；</li>
+<li>性能，即使用锁之后增加的时间开销。</li>
+</ul>
+<h1 id="锁的实现机制"><a href="#锁的实现机制" class="headerlink" title="锁的实现机制"></a>锁的实现机制</h1><h2 id="机制1：控制中断"><a href="#机制1：控制中断" class="headerlink" title="机制1：控制中断"></a>机制1：控制中断</h2><p>在早期，实现互斥的解决方案，就是在临界区关闭中断，这是为单处理器系统开发的，实现的伪代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    disableInterrupts();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    enableInterrupts();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关闭中断与打开中断，使用的是特权的硬件指令。通过在进入临界区之前关闭中断，可以保证临界区的代码不会被中断，从而原子地执行。临界区代码执行完成后，重新打开中断，程序继续正常运行。没有了中断，线程可以确信其代码会一直执行下去，不会被其他的线程干扰。</p>
+<p>但是该方案的缺点很多：</p>
+<ul>
+<li>该方案要求允许所有的线程都可以执行打开与关闭中断的特权操作，恶意的程序会滥用该机制，关闭中断后不在打开中断，从而独占处理器；</li>
+<li>该方案不支持多处理器；</li>
+<li>关闭中断会导致中断丢失，可能会导致非常严重的系统问题，比如磁盘IO操作完成，但是中断被关闭，CPU错过了这个事件，等待该IO操作的进程就无法被唤醒；</li>
+<li>该方案效率较低，现代CPU对关闭与打开中断的代码执行较慢。</li>
+</ul>
+<p>在计算机的发展历史上，出于某些原因，研究人员在早期热衷于研究不依赖硬件支持的锁机制，从后来的结果证明，这些工作没有太多的意义，只需要很少的硬件支持，就可以实现更好的锁机制。</p>
+<h2 id="机制2：测试并设置指令"><a href="#机制2：测试并设置指令" class="headerlink" title="机制2：测试并设置指令"></a>机制2：测试并设置指令</h2><p>锁的机制实现，需要硬件的支持。最简单的硬件支持是测试并设置指令（<code>test-and-set instruction</code>），也被称为原子交换（<code>atomic exchange</code>），实现的伪代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">TestAndSet</span><span class="params">(<span class="keyword">int</span> *old_ptr, <span class="keyword">int</span> <span class="keyword">new</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> old = *old_ptr;</span><br><span class="line">    *old_ptr = <span class="keyword">new</span>;</span><br><span class="line">    <span class="keyword">return</span> old;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>硬件指令，可以实现原子执行以上的一系列操作，可以根据这个硬件指令，实现一个简单的自旋锁：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">lock_t</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> flag;</span><br><span class="line">&#125;<span class="keyword">lock_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//0表示锁是可用的，1表示锁被其他线程占用</span></span><br><span class="line">    lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(TestAndSet(&amp;lock-&gt;flag, <span class="number">1</span>) == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ; <span class="comment">//自旋，等待</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>理解这个锁机制为什么能够工作，可以假设某个线程正在运行，调用<code>lock</code>后，没有其他的线程持有锁，<code>flag</code>值为0，调用<code>TestAndSet</code>后，指令会原子地将<code>flag</code>设置为1，并返回0，线程则跳出<code>while</code>循环。</p>
+<p>当某个线程已经持有锁，此时<code>flag</code>值为1，本线程调用<code>lock</code>尝试获取锁，<code>TestAndSet</code>会返回1，则本线程会在<code>while</code>循环中自旋，直到另一个线程释放锁，即将<code>flag</code>置为0为止。</p>
+<h2 id="机制3：比较并交换指令"><a href="#机制3：比较并交换指令" class="headerlink" title="机制3：比较并交换指令"></a>机制3：比较并交换指令</h2><p>硬件支持的另一个原语，是比较并交换指令（<code>compare-and-swap</code>或者<code>compare-and-exchange</code>）。该指令的伪代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">CompareAndSwap</span><span class="params">(<span class="keyword">int</span> *ptr, <span class="keyword">int</span> expected, <span class="keyword">int</span> <span class="keyword">new</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> actual = *ptr;</span><br><span class="line">    <span class="keyword">if</span>(actual == expected)</span><br><span class="line">    &#123;</span><br><span class="line">        *ptr = <span class="keyword">new</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> actual;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>比较并交换指令的基本思路是，检测<code>ptr</code>指向的值是否与<code>expected</code>相等，若相等，则更新<code>ptr</code>指向的值为新的值，否则，什么也不做，指令返回<code>ptr</code>原先指向的值。</p>
+<p>使用比较并交换指令，实现的锁机制可以为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">lock_t</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> flag;</span><br><span class="line">&#125;<span class="keyword">lock_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//0表示锁是可用的，1表示锁被其他线程占用</span></span><br><span class="line">    lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(CompareAndSwap(&amp;lock-&gt;flag, <span class="number">0</span>, <span class="number">1</span>) == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ; <span class="comment">//自旋，等待</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该硬件指令实现的自旋锁，与机制2所实现的等价。<code>CompareAndSwap(&amp;lock-&gt;flag, 0, 1)</code> 可以理解为，检查<code>flag</code>是否与0相等（0表示锁未被占用），若相等，则置<code>flag</code>为1，并返回<code>flag</code>的旧值0。</p>
+<h2 id="机制4：链接的加载和条件式存储指令"><a href="#机制4：链接的加载和条件式存储指令" class="headerlink" title="机制4：链接的加载和条件式存储指令"></a>机制4：链接的加载和条件式存储指令</h2><p>一些平台提供了链接的加载（<code>load-linked</code>）和条件式存储（<code>store-conditional</code>）指令，可以配合使用，来实现锁机制，指令的实现伪代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">LoadLinked</span><span class="params">(<span class="keyword">int</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> *ptr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">StoreConditional</span><span class="params">(<span class="keyword">int</span> *ptr, <span class="keyword">int</span> value)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(no one has updated *ptr since the LoadLinked to <span class="keyword">this</span> address)</span><br><span class="line">    &#123;</span><br><span class="line">        *ptr = value;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>; <span class="comment">/* success */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">/* failed to update */</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里关键的是条件式存储指令，只有上一次加载的地址在期间都没有更新时，才会更新成功。</p>
+<p>使用该指令实现的锁机制的伪代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">lock_t</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> flag;</span><br><span class="line">&#125;<span class="keyword">lock_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//0表示锁是可用的，1表示锁被其他线程占用</span></span><br><span class="line">    lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span>(LoadLinked(&amp;lock-&gt;flag) == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            ; <span class="comment">/* 自旋，等待flag为0 */</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(StoreConditional(&amp;lock-&gt;flag, <span class="number">1</span>) == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span>; <span class="comment">/* 条件存储成功则获取锁，否则重新LoadLinked */</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    lock-&gt;flag = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里需要关注条件式存储是如何失败的。一个线程调用了<code>lock</code>，执行链接的加载指令，返回0，表示当前锁可用，但是在执行条件式存储之前，被调度程序中断了，另一个线程占用了CPU，也调用了<code>lock</code>，也执行了链接的加载指令，同样此时锁是可用，返回0。</p>
+<p>现在两个线程都执行了链接的加载指令，将要执行条件式存储指令，重点是只有一个线程能够成功更新<code>flag</code>为1。先执行条件式存储指令的线程将会成功获取锁，而后执行条件式存储指令的线程将失败。</p>
+<h2 id="机制5：获取并增加指令"><a href="#机制5：获取并增加指令" class="headerlink" title="机制5：获取并增加指令"></a>机制5：获取并增加指令</h2><p>另一个硬件原语是获取并增加指令（<code>fetch-and-add</code>），该指令能够原子地返回特定地址的旧值，并将该旧值增加1。指令的伪代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">FetchAndAdd</span><span class="params">(<span class="keyword">int</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> old = *ptr;</span><br><span class="line">    *ptr = old + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> old;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据获取并增加指令，实现的锁机制可以为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">lock_t</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> ticket;</span><br><span class="line">    <span class="keyword">int</span> turn;</span><br><span class="line">&#125;<span class="keyword">lock_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lock_init</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    lock-&gt;ticket = <span class="number">0</span>;</span><br><span class="line">    lock-&gt;turn = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> myturn = FetchAndAdd(&amp;lock-&gt;ticket);</span><br><span class="line">    <span class="keyword">while</span>(lock-&gt;turn != myturn)</span><br><span class="line">    &#123;</span><br><span class="line">        ; <span class="comment">/* 自旋 */</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">(<span class="keyword">lock_t</span> *lock)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    FetchAndAdd(&amp;lock-&gt;turn);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/"># 技术杂文</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/06/03/shell%E5%91%BD%E4%BB%A4mount%E7%9A%84%E4%BD%BF%E7%94%A8%E7%AE%80%E4%BB%8B/">shell 命令 mount 的使用简介</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
