@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Jamza">
+
+
+
+
+
+<title>基于条件变量的生产者消费者问题 | Jamza&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/image/head.jpg">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Jamza&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Jamza&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">基于条件变量的生产者消费者问题</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Jamza</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 10, 2021&nbsp;&nbsp;15:00:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/">技术杂文</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <blockquote>
+<p>本文摘录至《操作系统导论》第30章的相关内容</p>
+</blockquote>
+<h1 id="生产者消费者问题"><a href="#生产者消费者问题" class="headerlink" title="生产者消费者问题"></a>生产者消费者问题</h1><p>所谓的生产者消费者（<code>producer consumer</code>）问题，也被称为有界缓存区（<code>bounded buffer</code>）问题，生产者将生成的数据放入缓冲区，消费者从缓冲区取走数据，以某种方式消费。</p>
+<p>在很多实际的系统中存在这样的场景，比如多线程网络服务器中，一个生产者将HTTP请求放入工作队列，多个消费者线程从队列中取走请求进行处理。再比如在shell中使用管道连接不同程序的输入与输出，比如<code>grep foo file.txt | wc -l</code>命令，<code>grep</code>是生产者，而<code>wc</code>是消费者。</p>
+<p>因为有界缓冲区是共享资源，所以我们必须通过某种同步机制来访问有界缓冲区，以避免产生竞态条件。</p>
+<h1 id="有问题的方案"><a href="#有问题的方案" class="headerlink" title="有问题的方案"></a>有问题的方案</h1><p>我们首先从一个简陋的方案开始，需要一个共享缓冲区，以便生产者存放数据，消费者取出数据，这里以一个整数作为缓冲区，两个函数分别实现将数值放入缓冲区，以及从缓冲区取走数值，相关代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> buffer</span><br><span class="line"><span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">put</span><span class="params">(<span class="keyword">int</span> value)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    assert(count == <span class="number">0</span>);</span><br><span class="line">    count = <span class="number">1</span>;</span><br><span class="line">    buffer = value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    assert(count == <span class="number">1</span>);</span><br><span class="line">    count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> buffer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在以上的代码中，<code>count</code>为1表示缓冲区已满，<code>count</code>为0表示缓冲区为空。</p>
+<p>现在我们需要一些操作，知道何时可以访问缓冲区，以便将数据放入缓冲区，或者从缓冲区读取数据。条件很明显，仅在<code>count</code>为0时，即缓冲区为空时，才将数据放入缓冲区，仅在<code>count</code>为1时，即缓冲区已满时，才从缓冲区取走数据，如果让生产者将数据放入已满的缓冲区，或者让消费者从已空的缓冲区获取数据，将发生错误。</p>
+<p>生产者线程与消费者线程分别向缓冲区放入数据与取走数据，以下代码模拟了生产者线程与消费者线程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">producer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> loops = (<span class="keyword">int</span>)arg;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; loops; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        put(i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">consumer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> tmp = get();</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, tmp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上的生产者线程与消费者线程，显然没有考虑缓冲区作为共享资源会存在临界区的问题，给代码加锁是没有用的，需要条件变量，修改后的代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cond_t</span> cond;</span><br><span class="line"><span class="keyword">mutex_t</span> mutex;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">producer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> loops = (<span class="keyword">int</span>)arg;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; loops; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">if</span>(count == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        put(i);</span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">consumer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> loops = (<span class="keyword">int</span>)arg;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; loops; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">if</span>(count == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> tmp = get();</span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, tmp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上的方案，存在两个严重的问题：</p>
+<h2 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h2><p>假设有两个消费者（消费者1与消费者2），一个生产者。</p>
+<p>首先，消费者1开始执行，获取锁后，检查缓冲区为空，然后执行<code>pthread_cond_wait</code>等待，进入睡眠，注意在此函数中会释放锁。</p>
+<p>接着，生产者开始运行，其获取锁，检查缓冲区，发现缓冲区未满，则向缓冲区放入数值，然后生产者执行<code>pthread_cond_signal</code>，发出信号，表示缓冲区已满，<strong>此时这个信号使得之前的消费者1不再睡眠，消费者1进入就绪队列</strong>，生产者发现缓冲区满后，进入睡眠。</p>
+<p>此时，如果消费者2如果抢先得到运行，消费了缓冲区中的数据，然后消费者2进入睡眠，消费者1得到运行，消费者1则从<code>pthread_cond_wait</code>中返回（注意，从此函数返回时，会获得锁），执行<code>get</code>操作，但是此时缓冲区已经为空了，问题出现了！</p>
+<p>显然，应该设法阻止消费1去读取缓冲区的数据，因为消费者2抢先将缓冲区的数据消费掉了。</p>
+<p>产生问题的原因也很简单，在消费者1被生产者唤醒后，但是在消费者1运行之前，缓冲区的状态已经发生了改变（消费者2抢先消费了数据），因此生产者发出信号，只是唤醒了消费者1，暗示缓冲区的状态发生了变化，但是并不会保证在消费者1运行之前的状态一直都是期望的情况。</p>
+<p>对此问题的解决方案很简单，将<code>if</code>语句改为<code>while</code>语句，表示当消费者1被唤醒后，应该立即再次检查共享变量，如果缓冲区此时为空，则消费者1应该回去继续睡眠，生产者需同样的修改，代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cond_t</span> cond;</span><br><span class="line"><span class="keyword">mutex_t</span> mutex;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">producer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> loops = (<span class="keyword">int</span>)arg;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; loops; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">while</span>(count == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        put(i);</span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">consumer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> loops = (<span class="keyword">int</span>)arg;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; loops; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">while</span>(count == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> tmp = get();</span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, tmp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题2"><a href="#问题2" class="headerlink" title="问题2"></a>问题2</h2><p>假设两个消费者先运行，缓冲区为空，因此消费者1与消费者2都进入睡眠，生产者开始运行，在缓冲区放入数值后，发现信号，生产者进入睡眠。发出的信号唤醒了一个消费者，假设唤醒的是消费者1，此时消费者1处于就绪队列，而消费者2与生成者都处于睡眠中，并且都等待在同一个条件变量上。</p>
+<p>消费者1得到运行，发现缓冲区为满，则消费者1消费了数据，然后消费者1发出了信号，在其睡眠之前，唤醒了一个正在等待的线程，即消费者2或者生产者。</p>
+<p>问题的关键是，唤醒的是哪个线程？因为消费者1已经消费掉了缓冲区的数据，理论上应该唤醒生产者，但是如果唤醒的是消费者2呢？此时问题出现了，消费者2被唤醒后，发现缓冲区为空，又回去睡眠了，此时，生产者，消费者1，消费者2都处于睡眠状态了，大家都睡着了，显然这是个缺陷。</p>
+<p>通过以上分析可知，消费者不应该唤醒消费者，而应该只唤醒生产者。对此问题的解决方案，就是使用两个条件变量，而不是一个。代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cond_t</span> empty;</span><br><span class="line"><span class="keyword">cond_t</span> fill;</span><br><span class="line"><span class="keyword">mutex_t</span> mutex;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">producer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> loops = (<span class="keyword">int</span>)arg;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; loops; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">while</span>(count == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(&amp;empty, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        put(i);</span><br><span class="line">        pthread_cond_signal(&amp;fill);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">consumer</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> loops = (<span class="keyword">int</span>)arg;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; loops; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="keyword">while</span>(count == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(&amp;fill, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> tmp = get();</span><br><span class="line">        pthread_cond_signal(&amp;empty);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, tmp);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上代码就可以解决了基于条件变量的生产者消费者问题。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%8A%80%E6%9C%AF%E6%9D%82%E6%96%87/"># 技术杂文</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2021/06/08/%E9%94%81%E7%9A%84%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">锁的底层实现原理</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Jamza | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
