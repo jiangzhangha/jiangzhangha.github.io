@@ -120,7 +120,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">May 22, 2021&nbsp;&nbsp;14:20:06</a>
+                        Date: <a href="#">July 1, 2021&nbsp;&nbsp;17:00:00</a>
                         </span>
                     
                     
@@ -167,6 +167,7 @@
 </ul>
 <p>在redis源码中，上述结构的定义源码为：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * ZSETs use a specialized version of Skiplists</span></span><br><span class="line"><span class="comment"> * 跳跃表中的数据节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> &#123;</span></span><br><span class="line">    sds ele;</span><br><span class="line">    <span class="keyword">double</span> score;</span><br><span class="line">    <span class="comment">// 后退指针</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">backward</span>;</span></span><br><span class="line">    <span class="comment">// 层</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistLevel</span> &#123;</span></span><br><span class="line">        <span class="comment">// 前进指针</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">forward</span>;</span></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 跨度实际上是用来计算元素排名(rank)的，</span></span><br><span class="line"><span class="comment">         * 在查找某个节点的过程中，将沿途访过的所有层的跨度累积起来，</span></span><br><span class="line"><span class="comment">         * 得到的结果就是目标节点在跳跃表中的排位</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">long</span> span;</span><br><span class="line">    &#125; level[];</span><br><span class="line">&#125; zskiplistNode;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 跳跃表结构体</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplist</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">header</span>, *<span class="title">tail</span>;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> length;</span><br><span class="line">    <span class="keyword">int</span> level;</span><br><span class="line">&#125; zskiplist;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 有序集合结构体</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zset</span> &#123;</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Redis 会将跳跃表中所有的元素和分值组成 </span></span><br><span class="line"><span class="comment">     * key-value 的形式保存在字典中</span></span><br><span class="line"><span class="comment">     * todo：注意：该字典并不是 Redis DB 中的字典，只属于有序集合</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    dict *dict;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 底层指向的跳跃表的指针</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    zskiplist *zsl;</span><br><span class="line">&#125; zset;</span><br></pre></td></tr></table></figure>
+
         </div>
 
         
@@ -184,7 +185,9 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/"># 数据库 - 数据结构与算法</a>
+                        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"># 数据库</a>
+                    
+                        <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/"># 数据结构与算法</a>
                     
                         
                 </span>
@@ -197,10 +200,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2021/05/22/%E7%95%AA%E8%8C%84%E5%B7%A5%E4%BD%9C%E6%B3%95/">番茄工作法</a>
             
-            
-            <a class="next" rel="next" href="/2021/05/22/docker%E7%9A%84%E7%BD%91%E7%BB%9C%E5%91%BD%E4%BB%A4%E7%A9%BA%E9%97%B4/">docker 的网络命令空间</a>
+            <a class="next" rel="next" href="/2021/06/26/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84ACID/">数据库的 ACID</a>
             
         </section>
 
