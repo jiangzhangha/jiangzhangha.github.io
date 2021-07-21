@@ -12,7 +12,7 @@
 
 
 
-<title>glob风格通配符 | Jamza&#39;s Blog</title>
+<title>进程后台运行与nohup命令 | Jamza&#39;s Blog</title>
 
 
 
@@ -111,7 +111,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">glob风格通配符</h1>
+            <h1 class="post-title">进程后台运行与nohup命令</h1>
             
                 <div class="post-meta">
                     
@@ -120,7 +120,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">July 2, 2021&nbsp;&nbsp;14:11:00</a>
+                        Date: <a href="#">July 21, 2021&nbsp;&nbsp;9:48:00</a>
                         </span>
                     
                     
@@ -136,24 +136,17 @@
         </header>
 
         <div class="post-content">
-            <p>所谓的glob风格通配符，即使用特定的字符（被称为元字符），实现快速匹配字符串的目的。这个目的与正则表达式基本相同，但是glob风格通配符相比正则表达式要简单很多，目前在Linux Shell中比较常见，另外在redis数据库中的订阅、发布功能中也被使用。</p>
-<p>glob风格通配符相关的元字符常用的包括：</p>
-<ul>
-<li><code>*</code>：匹配零个或者多个字符</li>
-<li><code>?</code>：匹配一个字符</li>
-<li><code>[]</code>：匹配指定集合中的任意单个字符，比如<code>[abc]</code>表示匹配单个字符a或者b或者c</li>
-<li><code>&#123;a,b&#125;</code>：匹配a或者b，a与b也是通配符，可以由其他通配符组成</li>
-<li><code>!</code>：表示非，比如<code>!1.txt</code>表示排除文件<code>1.txt</code>​</li>
-<li><code>[0-9]</code>：匹配单个数字</li>
-<li><code>[[:upper:]]</code>：匹配任意单个大写字母</li>
-<li><code>[[:lower:]]</code>：匹配任意单个小写字母</li>
-<li><code>[[:digit:]]</code>：匹配任意单个数字，等价于<code>[0-9]</code>​</li>
-<li><code>[[:alpha:]]</code>：匹配任意单个字母，包括大写字母与小写字母</li>
-<li><code>[[:alnum:]]</code>：匹配任意单个字母与数字</li>
-<li><code>[[:space:]]</code>：匹配单个空白字符</li>
-<li><code>[[:punctl:]]</code>：匹配单个标点符号</li>
-<li><code>[^]</code>:匹配指定集合之外的其他任意单个字符，比如<code>[^abc]</code>表示匹配除了a、b、c以外的其他任意字符</li>
-</ul>
+            <p>在Linux下一般如果想让某个进程在后台运行，多数使用<code>&amp;</code>在程序的结尾来实现，比如，如果要运行<code>mysql</code>在后台，可执行以下命令：</p>
+<p><code>/usr/local/mysql/bin/mysqld_safe --user=mysql &amp;</code></p>
+<p>但是在很多时候，我们的进程并不像<code>mysql</code>一样为守护进程，可能只是普通的进程，一般普通的进程使用<code>&amp;</code>实现后台运行时，如果运行的终端关闭，那么后台进程也会被关闭，因为当终端关闭时，系统会向所有的后台进程发送<code>SIGHUP</code>信号，进程收到该信号后默认退出。</p>
+<p>如果希望在终端关闭时，后台运行的进程能够继续运行而不退出，可以使用<code>nohup</code>命令，这样当终端关闭时，会屏蔽<code>SIGHUP</code>信号，后台运行的进程也就不会退出了。</p>
+<p>另外，通过<code>exit</code>或者<code>logout</code>命令正常退出时，后台运行的进程不会被中断，因此也就不需要<code>nohup</code>命令。</p>
+<p><code>nohup</code>命令的帮助信息为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[root@A23488811 lpaas]# nohup --help</span><br><span class="line">Usage: nohup COMMAND [ARG]...</span><br><span class="line">  or:  nohup OPTION</span><br><span class="line">Run COMMAND, ignoring hangup signals.</span><br><span class="line"></span><br><span class="line">      --help     display this help and exit</span><br><span class="line">      --version  output version information and exit</span><br><span class="line"></span><br><span class="line">If standard input is a terminal, redirect it from /dev/null.</span><br><span class="line">If standard output is a terminal, append output to &#x27;nohup.out&#x27; if possible,</span><br><span class="line">&#x27;$HOME/nohup.out&#x27; otherwise.</span><br><span class="line">If standard error is a terminal, redirect it to standard output.</span><br><span class="line">To save output to FILE, use &#x27;nohup COMMAND &gt; FILE&#x27;.</span><br><span class="line"></span><br><span class="line">NOTE: your shell may have its own version of nohup, which usually supersedes</span><br><span class="line">the version described here.  Please refer to your shell&#x27;s documentation</span><br><span class="line">for details about the options it supports.</span><br><span class="line"></span><br><span class="line">GNU coreutils online help: &lt;http://www.gnu.org/software/coreutils/&gt;</span><br><span class="line">For complete documentation, run: info coreutils &#x27;nohup invocation&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>nohup</code>命令使得进程后台运行的格式为：</p>
+<p><code>nohup command &amp;</code></p>
+<p><code>nohup</code>命令执行后，会产生日志文件<code>nohup.out</code>，把命令的执行中的消息保存到这个文件中。一般日志文件保存在当前目录下，如果当前目录不可写，那么自动保存到执行这个命令的用户的<code>home</code>目录下，例如<code>root</code>的话就保存在<code>/root/</code>目录下。</p>
 
         </div>
 
@@ -185,10 +178,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2021/07/21/%E8%BF%9B%E7%A8%8B%E5%90%8E%E5%8F%B0%E8%BF%90%E8%A1%8C%E4%B8%8Enohup/">进程后台运行与nohup命令</a>
             
-            
-            <a class="next" rel="next" href="/2021/07/01/%E8%B7%B3%E8%B7%83%E8%A1%A8%E7%AE%80%E4%BB%8B%E5%8F%8A%E5%9C%A8redis%E4%B8%AD%E7%9A%84%E4%BD%BF%E7%94%A8/">跳跃表简介及其在redis中的使用</a>
+            <a class="next" rel="next" href="/2021/07/02/glob%E9%A3%8E%E6%A0%BC%E9%80%9A%E9%85%8D%E7%AC%A6/">glob风格通配符</a>
             
         </section>
 
